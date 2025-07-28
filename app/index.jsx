@@ -1,12 +1,23 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import HomeScreen from './screens/HomeScreen';
+import EventSelector from './screens/EventSelector';
+import NewEventForm from './screens/NewEventForm';
+import EventDetails from './screens/EventDetails';
+import ParticipantCard from './screens/ParticipantCard';
 
-const Home = () => {
+const Stack = createNativeStackNavigator();
+
+export default function App() {
     return (
-        <View>
-            <Text>My Component</Text>
-        </View>
-    );
-};
+            <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="EventSelector" component={EventSelector} />
+                <Stack.Screen name="NewEventForm" component={NewEventForm} />
+                <Stack.Screen name="EventDetails" component={EventDetails} />
+                <Stack.Screen name="ParticipantCard" component={ParticipantCard} />
 
-export default Home;
+            </Stack.Navigator>
+    );
+}
