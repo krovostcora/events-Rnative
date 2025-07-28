@@ -1,145 +1,251 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import {
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    StyleSheet,
+    Platform,
+    ScrollView,
+} from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 
-const MOCK_EVENT = {
-    name: 'Sample Event',
-    date: '2024-07-01',
-    time: '10:00',
-    place: 'Central Park',
-    logo: 'https://www.google.com/search?sca_esv=c11b94e477694cad&sxsrf=AE3TifOONMEqy0kJH0y2LsGBa0WNOcJp-w:1753700910455&q=logo&udm=2&fbs=AIIjpHxU7SXXniUZfeShr2fp4giZ1Y6MJ25_tmWITc7uy4KIemkjk18Cn72Gp24fGkjjh6xW3zC71_lUWsj1x5Nnf4FS5n8M000dpyx2jf8TsQyVuB7zbnTp8WVXermLKucHpGgeehX1z8wrN6J6U78wiDjeS87vQfLVo1IV99NK66u6R2aU1qFFm81I5ycxUKmgCmUug4ar&sa=X&ved=2ahUKEwjqg73-tN-OAxXSUaQEHWTEOkUQtKgLKAF6BAgkEAE&biw=1600&bih=1000&dpr=1.8#vhid=tpE61O7FAdRiVM&vssid=mosaic'
-};
+const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
+
+const genderOptions = [
+    { label: 'Gender', value: '' },
+    { label: 'Female', value: 'female' },
+    { label: 'Male', value: 'male' },
+    { label: 'Other', value: 'other' },
+];
+
+function GenderSelect({ value, onChange, style }) {
+    return (
+        <Picker
+            selectedValue={value}
+            onValueChange={onChange}
+            style={[style, { color: value ? '#222' : '#aaa' }]}
+        >
+            {genderOptions.map((option) => (
+                <Picker.Item
+                    key={option.value}
+                    label={option.label}
+                    value={option.value}
+                />
+            ))}
+        </Picker>
+    );
+}
 
 export default function ParticipantCard({ navigation }) {
-    const [event, setEvent] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [form, setForm] = useState({
+        name: '',
+        surname: '',
+        age: '',
+        dni: '',
+        email: '',
+        phone: '',
+        gender: '',
+    });
 
-    useEffect(() => {
-        // Simulate loading
-        setTimeout(() => {
-            setEvent(MOCK_EVENT);
-            setLoading(false);
-        }, 1000);
-    }, []);
+    const [validationErrors, setValidationErrors] = useState({});
 
-    if (loading || error || !event) {
-        return (
-            <View style={styles.window}>
-                <View style={styles.body}>
-                    {loading ? (
-                        <ActivityIndicator size="large" />
-                    ) : (
-                        <Text style={styles.error}>{error || 'Loading event details...'}</Text>
-                    )}
-                </View>
-            </View>
-        );
-    }
+    const handleChange = (name, value) => {
+        setForm({ ...form, [name]: value });
+
+        const errors = { ...validationErrors };
+
+        if (name === 'name' || name === 'surname') {
+            errors[name] = value.trim() === '' ? `${name} is required` : '';
+        } else if (name === 'age') {
+            errors[name] = !value || value <= 0 ? 'Age must be a positive number' : '';
+        } else if (name === 'email') {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            errors[name] = value && !emailRegex.test(value) ? 'Invalid email format' : '';
+        } else if (name === 'phone') {
+            const phoneRegex = /^[0-9]*$/;
+            errors[name] = value && !phoneRegex.test(value) ? 'Phone must contain only digits' : '';
+        } else if (name === 'dni') {
+            errors[name] = value.trim() === '' ? 'DNI is required' : '';
+        }
+
+        setValidationErrors(errors);
+    };
+
+    const handleSubmit = () => {
+        let errors = {};
+        if (!form.name.trim()) errors.name = 'Name is required';
+        if (!form.surname.trim()) errors.surname = 'Surname is required';
+        if (!form.age || form.age <= 0) errors.age = 'Age must be a positive number';
+        if (!form.dni.trim()) errors.dni = 'DNI is required';
+
+        setValidationErrors(errors);
+
+        if (Object.values(errors).some(Boolean)) return;
+
+        alert('Submitted! (not saved)');
+    };
+
+    const handleCancel = () => {
+        navigation?.navigate('EventSelector');
+    };
 
     return (
-        <View style={styles.window}>
-            <View style={styles.body}>
-                <Text style={styles.eventName}>{event.name}</Text>
-                <View style={styles.topRow}>
-                    <Image
-                        source={{ uri: event.logo }}
-                        style={styles.logo}
-                        onError={({ nativeEvent }) => {
-                            nativeEvent.target.src = 'https://www.google.com/search?sca_esv=c11b94e477694cad&sxsrf=AE3TifOONMEqy0kJH0y2LsGBa0WNOcJp-w:1753700910455&q=logo&udm=2&fbs=AIIjpHxU7SXXniUZfeShr2fp4giZ1Y6MJ25_tmWITc7uy4KIemkjk18Cn72Gp24fGkjjh6xW3zC71_lUWsj1x5Nnf4FS5n8M000dpyx2jf8TsQyVuB7zbnTp8WVXermLKucHpGgeehX1z8wrN6J6U78wiDjeS87vQfLVo1IV99NK66u6R2aU1qFFm81I5ycxUKmgCmUug4ar&sa=X&ved=2ahUKEwjqg73-tN-OAxXSUaQEHWTEOkUQtKgLKAF6BAgkEAE&biw=1600&bih=1000&dpr=1.8#vhid=tpE61O7FAdRiVM&vssid=mosaic';
-                        }}
-                    />
-                    <View style={styles.eventData}>
-                        <View style={styles.dataSection}>
-                            <View>
-                                <Text style={styles.bold}>START</Text>
-                                <Text>Date: {event.date}</Text>
-                                <Text>Time: {event.time}</Text>
-                                <Text>Location: {event.place}</Text>
-                            </View>
-                            <View style={{ marginTop: 10 }}>
-                                <Text style={styles.bold}>FINISH</Text>
-                                <Text>Start and finish at the same location</Text>
-                                <Text>Additional info</Text>
-                            </View>
-                        </View>
-                    </View>
-                </View>
-                <View style={styles.buttonsRow}>
-                    <TouchableOpacity style={styles.button} onPress={() => navigation?.navigate('EventSelector')}>
-                        <Text style={styles.buttonText}>Cancel</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.button}>
-                        <Text style={styles.buttonText}>Manage Registrations</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={() => navigation?.navigate('ParticipantCard')}>
-                        <Text style={styles.buttonText}>Registrate</Text>
-                    </TouchableOpacity>
-                </View>
+        <View style={styles.container}>
+            <Text style={styles.title}>Register as a Participant</Text>
+            <ScrollView contentContainerStyle={styles.formBody} keyboardShouldPersistTaps="handled">
+                <TextInput
+                    style={styles.input}
+                    placeholder="Name *"
+                    placeholderTextColor="#aaa"
+                    value={form.name}
+                    onChangeText={(v) => handleChange('name', v)}
+                />
+                {validationErrors.name ? <Text style={styles.error}>{validationErrors.name}</Text> : null}
+
+                <TextInput
+                    style={styles.input}
+                    placeholder="Surname *"
+                    placeholderTextColor="#aaa"
+                    value={form.surname}
+                    onChangeText={(v) => handleChange('surname', v)}
+                />
+                {validationErrors.surname ? <Text style={styles.error}>{validationErrors.surname}</Text> : null}
+
+                <TextInput
+                    style={styles.input}
+                    placeholder="Age *"
+                    placeholderTextColor="#aaa"
+                    value={form.age}
+                    onChangeText={(v) => handleChange('age', v.replace(/[^0-9]/g, ''))}
+                    keyboardType="numeric"
+                />
+                {validationErrors.age ? <Text style={styles.error}>{validationErrors.age}</Text> : null}
+
+                <TextInput
+                    style={styles.input}
+                    placeholder="DNI *"
+                    placeholderTextColor="#aaa"
+                    value={form.dni}
+                    onChangeText={(v) => handleChange('dni', v)}
+                />
+                {validationErrors.dni ? <Text style={styles.error}>{validationErrors.dni}</Text> : null}
+
+                <TextInput
+                    style={styles.input}
+                    placeholder="Email"
+                    placeholderTextColor="#aaa"
+                    value={form.email}
+                    onChangeText={(v) => handleChange('email', v)}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                />
+                {validationErrors.email ? <Text style={styles.error}>{validationErrors.email}</Text> : null}
+
+                <TextInput
+                    style={styles.input}
+                    placeholder="Phone"
+                    placeholderTextColor="#aaa"
+                    value={form.phone}
+                    onChangeText={(v) => handleChange('phone', v.replace(/[^0-9]/g, ''))}
+                    keyboardType="phone-pad"
+                />
+                {validationErrors.phone ? <Text style={styles.error}>{validationErrors.phone}</Text> : null}
+
+            </ScrollView>
+            <View style={styles.buttonRow}>
+                <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.acceptButton} onPress={handleSubmit}>
+                    <Text style={styles.acceptButtonText}>Submit</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    window: {
+    container: {
         flex: 1,
-        justifyContent: 'center',
+        backgroundColor: '#f4f4f4',
         alignItems: 'center',
-        backgroundColor: '#fff'
+        paddingTop: 48,
     },
-    body: {
-        width: '90%',
-        padding: 20,
-        backgroundColor: '#f7f7f7',
-        borderRadius: 12,
-        elevation: 2
-    },
-    eventName: {
-        fontSize: 22,
+    title: {
+        fontFamily: FONT,
+        fontSize: 20,
         fontWeight: 'bold',
-        marginBottom: 16,
-        textAlign: 'center'
+        color: '#111',
+        letterSpacing: 1,
+        marginBottom: 18,
+        textAlign: 'center',
     },
-    topRow: {
-        flexDirection: 'row',
-        marginBottom: 20
+    formBody: {
+        width: 320,
+        alignItems: 'stretch',
+        paddingBottom: 120,
     },
-    logo: {
-        width: 100,
-        height: 100,
-        marginRight: 20,
-        borderRadius: 8,
-        backgroundColor: '#eee'
-    },
-    eventData: {
-        flex: 1,
-        justifyContent: 'center'
-    },
-    dataSection: {
-        flexDirection: 'column'
-    },
-    bold: {
-        fontWeight: 'bold',
-        marginBottom: 4
-    },
-    buttonsRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 24
-    },
-    button: {
-        backgroundColor: '#007bff',
-        paddingVertical: 10,
-        paddingHorizontal: 14,
-        borderRadius: 6,
-        marginHorizontal: 4
-    },
-    buttonText: {
-        color: '#fff',
-        fontWeight: 'bold'
+    input: {
+        width: '100%',
+        height: 44,
+        borderWidth: 1,
+        borderColor: '#bbb',
+        backgroundColor: '#fff',
+        fontFamily: FONT,
+        fontSize: 16,
+        color: '#222',
+        marginBottom: 10,
+        paddingHorizontal: 12,
+        borderRadius: 0,
     },
     error: {
         color: 'red',
-        textAlign: 'center'
-    }
+        fontFamily: FONT,
+        fontSize: 13,
+        marginBottom: 6,
+        marginLeft: 2,
+    },
+    buttonRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: 320,
+        position: 'absolute',
+        bottom: 36,
+        left: 24,
+    },
+    cancelButton: {
+        backgroundColor: '#e0e0e0',
+        borderWidth: 1,
+        borderColor: '#bbb',
+        borderRadius: 0,
+        paddingVertical: 14,
+        paddingHorizontal: 36,
+        minWidth: 120,
+        alignItems: 'center',
+    },
+    cancelButtonText: {
+        color: '#222',
+        fontFamily: FONT,
+        fontWeight: 'bold',
+        fontSize: 16,
+        letterSpacing: 1,
+    },
+    acceptButton: {
+        backgroundColor: '#111',
+        borderWidth: 1,
+        borderColor: '#bbb',
+        borderRadius: 0,
+        paddingVertical: 14,
+        paddingHorizontal: 36,
+        minWidth: 120,
+        alignItems: 'center',
+    },
+    acceptButtonText: {
+        color: '#fff',
+        fontFamily: FONT,
+        fontWeight: 'bold',
+        fontSize: 16,
+        letterSpacing: 1,
+    },
 });

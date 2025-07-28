@@ -87,19 +87,20 @@ export default function EventDetails({ route, navigation }) {
                 <Text style={styles.manageButtonText}>Manage registrations</Text>
             </TouchableOpacity>
             {/* Cancel bottom left */}
-            <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => navigation.navigate('EventSelector')}
-            >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-            {/* Registrate bottom right */}
-            <TouchableOpacity
-                style={styles.startButton}
-                onPress={() => navigation.navigate('ParticipantCard')}
-            >
-                <Text style={styles.startButtonText}>Registrate</Text>
-            </TouchableOpacity>
+            <View style={styles.buttonRow}>
+                <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={() => navigation.navigate('EventSelector')}
+                >
+                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.startButton}
+                    onPress={() => navigation.navigate('ParticipantCard')}
+                >
+                    <Text style={styles.startButtonText}>Registrate</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 
@@ -186,29 +187,29 @@ const styles = StyleSheet.create({
         letterSpacing: 2,
     },
     buttonRow: {
-        flexDirection: 'column',
+        flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        width: 495,
-        maxWidth: '95%',
-        gap: 18,
         position: 'absolute',
         bottom: 36,
-        left: (Dimensions.get('window').width - Math.min(495, Dimensions.get('window').width * 0.95)) / 2,
+        left: 0,
+        right: 0,
+        width: '100%',
+        gap: 24,
     },
     manageButton: {
-        position: 'absolute',
+        position: 'static',
         left: 30,
         right: 30,
         bottom: 130, // adjust as needed to keep above the bottom buttons
-        marginLeft: 'auto',
-        marginRight: 'auto',
+        marginLeft: 0,
+        marginRight: 0,
         backgroundColor: '#444',
         borderWidth: 1,
         borderColor: '#bbb',
         borderRadius: 0,
         paddingVertical: 16,
-        paddingHorizontal: 28,
+        paddingHorizontal: 15,
         minWidth: 150,
         alignItems: 'center',
         alignSelf: 'center',
@@ -221,9 +222,6 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     cancelButton: {
-        position: 'absolute',
-        left: 24,
-        bottom: 36,
         backgroundColor: '#e0e0e0',
         borderWidth: 1,
         borderColor: '#bbb',
@@ -241,9 +239,6 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     startButton: {
-        position: 'absolute',
-        right: 24,
-        bottom: 36,
         backgroundColor: '#111',
         borderWidth: 1,
         borderColor: '#bbb',

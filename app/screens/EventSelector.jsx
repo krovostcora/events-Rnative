@@ -98,12 +98,20 @@ export default function EventSelector({ navigation }) {
                 >
                     <Text style={styles.cancelButtonText}>Cancel</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.newButton}
-                    onPress={() => navigation.navigate('NewEventForm')}
-                >
-                    <Text style={styles.newButtonText}>New event</Text>
-                </TouchableOpacity>
+                <View>
+                    <TouchableOpacity
+                        style={styles.newButton}
+                        onPress={() => navigation.navigate('DateSearch')}
+                    >
+                        <Text style={styles.newButtonText}>Search by date</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.newButton, { marginTop: 10 }]}
+                        onPress={() => navigation.navigate('NewEventForm')}
+                    >
+                        <Text style={styles.newButtonText}>New event</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     );
@@ -188,18 +196,32 @@ const styles = StyleSheet.create({
         fontSize: 18,
         letterSpacing: 1,
     },
+    status: {
+        marginTop: 10,
+        fontFamily: FONT,
+        fontStyle: 'italic',
+        color: '#555',
+        fontSize: 14,
+    },
+    // Update these styles in your StyleSheet
     buttonRow: {
         flexDirection: 'row',
-        gap: 24,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        bottom: 36,
+        left: 0,
+        gap: 16,
+        right: 0,
+        width: '100%',
     },
     cancelButton: {
         backgroundColor: '#e0e0e0',
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: '#bbb',
         borderRadius: 0,
-        paddingVertical: 16,
+        paddingVertical: 14,
         paddingHorizontal: 36,
-        marginRight: 12,
         minWidth: 120,
         alignItems: 'center',
     },
@@ -207,30 +229,25 @@ const styles = StyleSheet.create({
         color: '#222',
         fontFamily: FONT,
         fontWeight: 'bold',
-        fontSize: 18,
+        fontSize: 16,
         letterSpacing: 1,
     },
     newButton: {
-        backgroundColor: '#444',
-        borderWidth: 2,
+        backgroundColor: '#111',
+        borderWidth: 1,
         borderColor: '#bbb',
         borderRadius: 0,
-        paddingVertical: 16,
+        paddingVertical: 14,
         paddingHorizontal: 36,
         minWidth: 120,
+        maxWidth: 170,
+        alignItems: 'center',
     },
     newButtonText: {
         color: '#fff',
         fontFamily: FONT,
         fontWeight: 'bold',
-        fontSize: 18,
+        fontSize: 16,
         letterSpacing: 1,
-    },
-    status: {
-        marginTop: 10,
-        fontFamily: FONT,
-        fontStyle: 'italic',
-        color: '#555',
-        fontSize: 14,
     },
 });
