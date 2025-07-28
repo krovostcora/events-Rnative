@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     logoContainer: {
-        marginBottom: 48,
+        marginBottom: 100,
         alignItems: 'center',
     },
     logoRow: {

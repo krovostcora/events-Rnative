@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, Button, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform, Linking, Dimensions } from 'react-native';
+
+const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
 export default function EventDetails({ route, navigation }) {
     const eventName = typeof route.params?.event === 'string' ? route.params.event : null;
@@ -14,35 +16,32 @@ export default function EventDetails({ route, navigation }) {
             setLoading(false);
             return;
         }
-
-        // Mocked data for the selected event
         const mockEvents = {
             '20250710_summerparty': {
                 name: 'Summer Party',
                 date: '2025-07-10',
                 time: '18:00',
-                place: 'Vilnius City Park'
+                place: 'Vilnius City Park',
+                arrival: 'Arrive 15 min before start'
             },
             '20250901_birthdaybash': {
                 name: 'Birthday Bash',
                 date: '2025-09-01',
                 time: '20:00',
-                place: 'Downtown Lounge'
+                place: 'Downtown Lounge',
+                arrival: 'Arrive 10 min before start'
             },
             '20251031_halloweennight': {
                 name: 'Halloween Night',
                 date: '2025-10-31',
                 time: '21:30',
-                place: 'Haunted House Club'
+                place: 'Haunted House Club',
+                arrival: 'Arrive 20 min before start'
             }
         };
-
         const data = mockEvents[eventName];
-        if (data) {
-            setEvent(data);
-        } else {
-            setError('Event not found');
-        }
+        if (data) setEvent(data);
+        else setError('Event not found');
         setLoading(false);
     }, [eventName]);
 
@@ -56,71 +55,222 @@ export default function EventDetails({ route, navigation }) {
         );
     }
 
+    // Dummy link for location
+    const handleLocationPress = () => {
+        Linking.openURL('https://maps.google.com');
+    };
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>{event.name}</Text>
-
-            <View style={styles.row}>
-                <Image
-                    source={require('../../assets/placeholder-logo.png')}
-                    style={styles.logo}
-                />
-                <View style={styles.details}>
-                    <Text style={styles.sectionTitle}>START</Text>
-                    <Text>Date: {event.date}</Text>
-                    <Text>Time: {event.time}</Text>
-                    <Text>Location: {event.place}</Text>
-
-                    <Text style={[styles.sectionTitle, { marginTop: 16 }]}>FINISH</Text>
-                    <Text>Start and finish at the same location</Text>
-                    <Text>Additional info</Text>
+            <View style={styles.topRow}>
+                <View style={styles.logoBox}>
+                    <Text style={styles.logoText}>LOGO</Text>
+                </View>
+                <View style={styles.detailsBox}>
+                    <Text style={styles.detailText}>Date: {event.date}</Text>
+                    <Text style={styles.detailText}>Time: {event.time}</Text>
+                    <TouchableOpacity onPress={handleLocationPress} activeOpacity={0.7}>
+                        <Text style={styles.linkText}>{event.place}</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.detailText}>{event.arrival}</Text>
                 </View>
             </View>
-
-            <View style={styles.buttonRow}>
-                <Button title="Cancel" onPress={() => navigation.navigate('EventSelector')} />
-                <Button title="Manage Registrations" onPress={() => {}} />
-                <Button title="Registrate" onPress={() => navigation.navigate('ParticipantCard')} />
+            <View style={styles.mapBox}>
+                <Text style={styles.mapText}>MAP / ROUTE PREVIEW</Text>
             </View>
+            {/* Manage registrations button centered above bottom */}
+            <TouchableOpacity
+                style={styles.manageButton}
+                onPress={() => {}}
+            >
+                <Text style={styles.manageButtonText}>Manage registrations</Text>
+            </TouchableOpacity>
+            {/* Cancel bottom left */}
+            <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => navigation.navigate('EventSelector')}
+            >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+            {/* Registrate bottom right */}
+            <TouchableOpacity
+                style={styles.startButton}
+                onPress={() => navigation.navigate('ParticipantCard')}
+            >
+                <Text style={styles.startButtonText}>Registrate</Text>
+            </TouchableOpacity>
         </View>
     );
+
 }
 
 const styles = StyleSheet.create({
-    container: { padding: 16 },
+    container: {
+        flex: 1,
+        backgroundColor: '#f4f4f4',
+        paddingTop: 36,
+        alignItems: 'center',
+    },
     title: {
+        fontFamily: FONT,
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 16,
-        textAlign: 'center'
+        color: '#111',
+        letterSpacing: 1,
+        marginBottom: 24,
+        textAlign: 'center',
     },
-    row: {
+    topRow: {
         flexDirection: 'row',
-        gap: 12
+        width: 495,
+        maxWidth: '95%',
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        marginBottom: 24,
+        gap: 24,
     },
-    logo: {
-        width: 100,
-        height: 100,
-        resizeMode: 'contain',
-        marginRight: 12
+    logoBox: {
+        width: 122,
+        height: 122,
+        borderWidth: 1,
+        borderColor: '#bbb',
+        backgroundColor: '#fafafa',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 0,
     },
-    details: {
+    logoText: {
+        fontFamily: FONT,
+        fontSize: 16,
+        color: '#888',
+        letterSpacing: 1,
+    },
+    detailsBox: {
         flex: 1,
-        justifyContent: 'space-around'
+        justifyContent: 'flex-start',
+        gap: 8,
+        marginLeft: 24,
     },
-    sectionTitle: {
-        fontWeight: 'bold'
+    detailText: {
+        fontFamily: FONT,
+        fontSize: 16,
+        color: '#222',
+        marginBottom: 2,
+        letterSpacing: 1,
+    },
+    linkText: {
+        fontFamily: FONT,
+        fontSize: 16,
+        color: '#1976d2',
+        textDecorationLine: 'underline',
+        marginBottom: 2,
+        letterSpacing: 1,
+    },
+    mapBox: {
+        width: 495,
+        maxWidth: '95%',
+        height: 120,
+        borderWidth: 1,
+        borderColor: '#bbb',
+        backgroundColor: '#fafafa',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 36,
+        borderRadius: 0,
+    },
+    mapText: {
+        fontFamily: FONT,
+        fontSize: 18,
+        color: '#888',
+        letterSpacing: 2,
     },
     buttonRow: {
-        marginTop: 24,
-        gap: 12
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 495,
+        maxWidth: '95%',
+        gap: 18,
+        position: 'absolute',
+        bottom: 36,
+        left: (Dimensions.get('window').width - Math.min(495, Dimensions.get('window').width * 0.95)) / 2,
+    },
+    manageButton: {
+        position: 'absolute',
+        left: 30,
+        right: 30,
+        bottom: 130, // adjust as needed to keep above the bottom buttons
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        backgroundColor: '#444',
+        borderWidth: 1,
+        borderColor: '#bbb',
+        borderRadius: 0,
+        paddingVertical: 16,
+        paddingHorizontal: 28,
+        minWidth: 150,
+        alignItems: 'center',
+        alignSelf: 'center',
+    },
+    manageButtonText: {
+        color: '#fff',
+        fontFamily: FONT,
+        fontWeight: 'bold',
+        fontSize: 16,
+        letterSpacing: 1,
+    },
+    cancelButton: {
+        position: 'absolute',
+        left: 24,
+        bottom: 36,
+        backgroundColor: '#e0e0e0',
+        borderWidth: 1,
+        borderColor: '#bbb',
+        borderRadius: 0,
+        paddingVertical: 16,
+        paddingHorizontal: 28,
+        minWidth: 110,
+        alignItems: 'center',
+    },
+    cancelButtonText: {
+        color: '#222',
+        fontFamily: FONT,
+        fontWeight: 'bold',
+        fontSize: 16,
+        letterSpacing: 1,
+    },
+    startButton: {
+        position: 'absolute',
+        right: 24,
+        bottom: 36,
+        backgroundColor: '#111',
+        borderWidth: 1,
+        borderColor: '#bbb',
+        borderRadius: 0,
+        paddingVertical: 16,
+        paddingHorizontal: 28,
+        minWidth: 120,
+        alignItems: 'center',
+    },
+    startButtonText: {
+        color: '#fff',
+        fontFamily: FONT,
+        fontWeight: 'bold',
+        fontSize: 16,
+        letterSpacing: 1,
     },
     loading: {
         textAlign: 'center',
-        fontStyle: 'italic'
+        fontStyle: 'italic',
+        fontFamily: FONT,
+        color: '#555',
+        fontSize: 16,
     },
     error: {
         color: 'red',
-        textAlign: 'center'
-    }
+        textAlign: 'center',
+        fontFamily: FONT,
+        fontSize: 16,
+    },
 });
