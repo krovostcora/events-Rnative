@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "scripts": {
-    "start": "expo start",
+    "start": "EXPO_ROUTER_APP_ROOT=./app expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
@@ -26,6 +26,7 @@
     "react-native-webview": "13.13.5"
   },
   "devDependencies": {
+    "@react-native-community/cli": "latest",
     "@babel/core": "^7.20.0",
     "@expo/vector-icons": "^14.1.0",
     "@react-native-community/datetimepicker": "^8.4.3",
@@ -36,7 +37,8 @@
     "express": "^5.1.0",
     "papaparse": "^5.5.3",
     "react-native-picker": "^4.3.7",
-    "react-native-svg-transformer": "^1.5.1"
+    "react-native-svg-transformer": "^1.5.1",
+    "uuid": "^11.1.0"
   },
   "private": true
 }

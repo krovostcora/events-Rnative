@@ -9,6 +9,31 @@ import {
     secondaryButtonText,
 }from '../components/constants';
 
+
+async function sendEventToServer(form) {
+    const generateId = () => Math.random().toString(36).substring(2, 10) + Date.now();
+    const id = generateId();
+    const csvLine = `${id};${form.name};${form.date};${form.time};${form.place}\n`;
+
+    const response = await fetch('https://events-server-eu5z.onrender.com/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            csvLine,
+            date: form.date,
+            name: form.name,
+            time: form.time,
+            place: form.place,
+        }),
+    });
+
+
+    if (!response.ok) {
+        throw new Error('Failed to save event');
+    }
+}
+
+
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
 export default function NewEventForm({ navigation }) {
@@ -32,9 +57,16 @@ export default function NewEventForm({ navigation }) {
 
 
 
-    const handleAccept = () => {
-        navigation.navigate('EventSelector');
+    const handleAccept = async () => {
+        try {
+            await sendEventToServer(form);
+            navigation.navigate('EventSelector');
+        } catch (err) {
+            console.error('Failed to send event:', err);
+            alert('Error saving event');
+        }
     };
+
 
     return (
         <View style={styles.container}>

@@ -5,8 +5,6 @@ import {
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-    toggleButton,
-    toggleButtonText,
 } from '../components/constants';
 
 export default function EventSelector({ navigation }) {
@@ -18,16 +16,18 @@ export default function EventSelector({ navigation }) {
     const [dropdownTop, setDropdownTop] = useState(0);
 
     useEffect(() => {
-        const mockEvents = [
-            { id: '1', name: 'Summer Party', folder: '20250710_summerparty' },
-            { id: '2', name: 'Birthday Bash', folder: '20250901_birthdaybash' },
-            { id: '3', name: 'Halloween Night', folder: '20251031_halloweennight' }
-        ];
-        setTimeout(() => {
-            setEvents(mockEvents);
-            setLoading(false);
-        }, 500);
+        fetch('https://events-server-eu5z.onrender.com/api/events')
+            .then(res => res.json())
+            .then(data => {
+                setEvents(data);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error('Failed to fetch events:', err);
+                setLoading(false);
+            });
     }, []);
+
 
     const handleAccept = () => {
         if (selectedEvent) {

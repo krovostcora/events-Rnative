@@ -5,82 +5,80 @@ import {
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-    toggleButton,
-    toggleButtonText,
 } from '../components/constants';
 
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
 export default function EventDetails({ route, navigation }) {
-    const eventName = typeof route.params?.event === 'string' ? route.params.event : null;
-
+    const eventId = route.params?.event;
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        if (!eventName) {
+        if (!eventId) {
             setError('No event selected');
             setLoading(false);
             return;
         }
-        const mockEvents = {
-            '20250710_summerparty': {
-                name: 'Summer Party',
-                date: '2025-07-10',
-                time: '18:00',
-                place: 'Vilnius City Park',
-                arrival: 'Arrive 15 min before start'
-            },
-            '20250901_birthdaybash': {
-                name: 'Birthday Bash',
-                date: '2025-09-01',
-                time: '20:00',
-                place: 'Downtown Lounge',
-                arrival: 'Arrive 10 min before start'
-            },
-            '20251031_halloweennight': {
-                name: 'Halloween Night',
-                date: '2025-10-31',
-                time: '21:30',
-                place: 'Haunted House Club',
-                arrival: 'Arrive 20 min before start'
-            }
-        };
-        const data = mockEvents[eventName];
-        if (data) setEvent(data);
-        else setError('Event not found');
-        setLoading(false);
-    }, [eventName]);
 
-    if (loading || error || !event) {
+        fetch(`https://events-server-eu5z.onrender.com/api/events/${eventId}`)
+            .then((res) => {
+                if (!res.ok) throw new Error('Event not found');
+                return res.json();
+            })
+            .then((data) => {
+                setEvent(data);
+            })
+            .catch((err) => {
+                setError(err.message || 'Failed to load event');
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, [eventId]);
+
+    const handleLocationPress = () => {
+        if (event?.place) {
+            const url = `https://maps.google.com/?q=${encodeURIComponent(event.place)}`;
+            Linking.openURL(url);
+        }
+    };
+
+    if (loading) {
         return (
             <View style={styles.container}>
-                <Text style={error ? styles.error : styles.loading}>
-                    {error || 'Loading event details...'}
-                </Text>
+                <Text style={styles.loading}>Loading event details...</Text>
             </View>
         );
     }
 
-    const handleLocationPress = () => {
-        Linking.openURL('https://maps.google.com');
-    };
+    if (error || !event) {
+        return (
+            <View style={styles.container}>
+                <Text style={styles.error}>{error || 'Event not found'}</Text>
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>{event.name}</Text>
+
             <View style={styles.topRow}>
                 <View style={styles.logoBox}>
                     <Text style={styles.logoText}>LOGO</Text>
                 </View>
+
                 <View style={styles.detailsBox}>
                     <Text style={styles.detailText}>Date: {event.date}</Text>
                     <Text style={styles.detailText}>Time: {event.time}</Text>
                     <TouchableOpacity onPress={handleLocationPress} activeOpacity={0.7}>
                         <Text style={styles.linkText}>{event.place}</Text>
                     </TouchableOpacity>
-                    <Text style={styles.detailText}>{event.arrival}</Text>
+                    {event.arrival && (
+                        <Text style={styles.detailText}>{event.arrival}</Text>
+                    )}
                 </View>
             </View>
 
@@ -117,104 +115,77 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f4f4f4',
-        paddingTop: 36,
+        paddingHorizontal: 24,
+        paddingTop: 48,
         alignItems: 'center',
     },
     title: {
         fontFamily: FONT,
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#111',
-        letterSpacing: 1,
-        marginBottom: 24,
-        textAlign: 'center',
+        marginBottom: 16,
+        color: '#222',
     },
     topRow: {
         flexDirection: 'row',
-        width: 495,
-        maxWidth: '95%',
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
         marginBottom: 24,
-        gap: 24,
     },
     logoBox: {
-        width: 122,
-        height: 122,
-        borderWidth: 1,
-        borderColor: '#bbb',
-        backgroundColor: '#fafafa',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 0,
-    },
-    logoText: {
-        fontFamily: FONT,
-        fontSize: 16,
-        color: '#888',
-        letterSpacing: 1,
-    },
-    detailsBox: {
-        flex: 1,
-        justifyContent: 'flex-start',
-        gap: 8,
-        marginLeft: 24,
-    },
-    detailText: {
-        fontFamily: FONT,
-        fontSize: 16,
-        color: '#222',
-        marginBottom: 2,
-        letterSpacing: 1,
-    },
-    linkText: {
-        fontFamily: FONT,
-        fontSize: 16,
-        color: '#1976d2',
-        textDecorationLine: 'underline',
-        marginBottom: 2,
-        letterSpacing: 1,
-    },
-    mapBox: {
-        width: 495,
-        maxWidth: '95%',
+        width: 120,
         height: 120,
         borderWidth: 1,
         borderColor: '#bbb',
         backgroundColor: '#fafafa',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 36,
-        borderRadius: 0,
+        marginRight: 24,
+    },
+    logoText: {
+        fontFamily: FONT,
+        fontSize: 14,
+        color: '#888',
+    },
+    detailsBox: {
+        justifyContent: 'center',
+    },
+    detailText: {
+        fontFamily: FONT,
+        fontSize: 16,
+        color: '#222',
+        marginBottom: 6,
+    },
+    linkText: {
+        fontFamily: FONT,
+        fontSize: 16,
+        color: '#007AFF',
+        textDecorationLine: 'underline',
+    },
+    mapBox: {
+        width: '100%',
+        height: 150,
+        backgroundColor: '#ddd',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 24,
     },
     mapText: {
         fontFamily: FONT,
-        fontSize: 18,
-        color: '#888',
-        letterSpacing: 2,
+        fontSize: 16,
+        color: '#444',
     },
     buttonRow: {
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'center',
-        position: 'absolute',
-        bottom: 36,
-        left: 0,
-        right: 0,
-        width: '100%',
         gap: 24,
     },
-    loading: {
-        textAlign: 'center',
-        fontStyle: 'italic',
-        fontFamily: FONT,
-        color: '#555',
-        fontSize: 16,
-    },
     error: {
-        color: 'red',
-        textAlign: 'center',
         fontFamily: FONT,
         fontSize: 16,
+        color: 'red',
+    },
+    loading: {
+        fontFamily: FONT,
+        fontSize: 16,
+        color: '#555',
     },
 });
