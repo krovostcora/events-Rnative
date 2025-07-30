@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {
@@ -29,7 +28,9 @@ export default function NewEventForm({ navigation }) {
             setForm({ ...form, logo: result.assets[0] });
         }
     };
-    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState({ mode: null, visible: false });
+
+
 
     const handleAccept = () => {
         navigation.navigate('EventSelector');
@@ -53,7 +54,7 @@ export default function NewEventForm({ navigation }) {
                 )}
             </TouchableOpacity>
 
-
+            {/*Date input*/}
             {Platform.OS === 'web' ? (
                 <input
                     type="date"
@@ -64,20 +65,25 @@ export default function NewEventForm({ navigation }) {
             ) : (
                 <>
                     <TouchableOpacity
-                        onPress={() => setShowDatePicker(true)}
+                        onPress={() =>
+                            setShowDatePicker(prev => ({
+                                mode: 'date',
+                                visible: prev.visible && prev.mode === 'date' ? false : true
+                            }))
+                        }
                         style={styles.input}
                     >
                         <Text style={{ fontFamily: FONT, fontSize: 16, lineHeight: 44, color: form.date ? '#222' : '#aaa' }}>
                             {form.date || 'Date (YYYY-MM-DD)'}
                         </Text>
                     </TouchableOpacity>
-                    {showDatePicker && (
+                    {showDatePicker.visible && showDatePicker.mode === 'date' && (
                         <DateTimePicker
                             value={form.date ? new Date(form.date) : new Date()}
                             mode="date"
                             display={Platform.OS === 'ios' ? 'inline' : 'calendar'}
                             onChange={(event, selectedDate) => {
-                                setShowDatePicker(false);
+                                setShowDatePicker({ mode: null, visible: false });
                                 if (selectedDate) {
                                     setForm({ ...form, date: selectedDate.toISOString().slice(0, 10) });
                                 }
@@ -87,13 +93,49 @@ export default function NewEventForm({ navigation }) {
                 </>
             )}
 
-            <TextInput
-                style={styles.input}
-                placeholder="Time (HH:MM)"
-                placeholderTextColor="#aaa"
-                value={form.time}
-                onChangeText={(text) => setForm({ ...form, time: text })}
-            />
+            {/*Time input*/}
+            {Platform.OS === 'web' ? (
+                <input
+                    type="time"
+                    value={form.time}
+                    onChange={(e) => setForm({ ...form, time: e.target.value })}
+                    style={styles.webInputDate}
+                />
+            ) : (
+                <>
+                    <TouchableOpacity
+                        onPress={() =>
+                            setShowDatePicker(prev => ({
+                                mode: 'time',
+                                visible: prev.visible && prev.mode === 'time' ? false : true
+                            }))
+                        }
+                        style={styles.input}
+                    >
+                        <Text style={{ fontFamily: FONT, fontSize: 16, lineHeight: 44, color: form.time ? '#222' : '#aaa' }}>
+                            {form.time || 'Time (HH:MM)'}
+                        </Text>
+                    </TouchableOpacity>
+                    {showDatePicker.visible && showDatePicker.mode === 'time' && (
+                        <DateTimePicker
+                            value={new Date()}
+                            mode="time"
+                            display="spinner"
+                            is24Hour={true}
+                            onChange={(event, selectedTime) => {
+                                setShowDatePicker({ mode: null, visible: false });
+                                if (selectedTime) {
+                                    const hours = selectedTime.getHours().toString().padStart(2, '0');
+                                    const minutes = selectedTime.getMinutes().toString().padStart(2, '0');
+                                    setForm({ ...form, time: `${hours}:${minutes}` });
+                                }
+                            }}
+                        />
+                    )}
+                </>
+            )}
+
+
             <TextInput
                 style={styles.input}
                 placeholder="Place"
@@ -193,5 +235,4 @@ const styles = StyleSheet.create({
         paddingLeft: 15,
         paddingRight: 15,
     }
-
 });
