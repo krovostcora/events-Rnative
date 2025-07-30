@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform, Linking } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform, Linking, Image } from 'react-native';
 import {
     primaryButton,
     primaryButtonText,
@@ -67,7 +67,12 @@ export default function EventDetails({ route, navigation }) {
 
             <View style={styles.topRow}>
                 <View style={styles.logoBox}>
-                    <Text style={styles.logoText}>LOGO</Text>
+                    {event.logo ? (
+                        <Image source={{ uri: event.logo }} style={styles.logoImage} resizeMode="contain" />
+                    ) : (
+                        <Text style={styles.logoText}>LOGO</Text>
+                    )}
+
                 </View>
 
                 <View style={styles.detailsBox}>
@@ -145,6 +150,11 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#888',
     },
+    logoImage: {
+        width: '100%',
+        height: '100%',
+    },
+
     detailsBox: {
         justifyContent: 'center',
     },
