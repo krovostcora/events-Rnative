@@ -87,9 +87,9 @@ export default function EventDetails({ route, navigation }) {
                 </View>
             </View>
 
-            <View style={styles.mapBox}>
-                <Text style={styles.mapText}>MAP / ROUTE PREVIEW</Text>
-            </View>
+            {/*<View style={styles.mapBox}>*/}
+            {/*    <Text style={styles.mapText}>MAP / ROUTE PREVIEW</Text>*/}
+            {/*</View>*/}
 
             <TouchableOpacity
                 style={[primaryButton, { marginBottom: 80 }]}
