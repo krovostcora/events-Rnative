@@ -136,13 +136,26 @@ export default function NewEventForm({ navigation }) {
             )}
 
 
-            <TextInput
+            {/*<TextInput*/}
+            {/*    style={styles.input}*/}
+            {/*    placeholder="Place"*/}
+            {/*    placeholderTextColor="#aaa"*/}
+            {/*    value={form.place}*/}
+            {/*    onChangeText={(text) => setForm({ ...form, place: text })}*/}
+            {/*/>*/}
+            <TouchableOpacity
                 style={styles.input}
-                placeholder="Place"
-                placeholderTextColor="#aaa"
-                value={form.place}
-                onChangeText={(text) => setForm({ ...form, place: text })}
-            />
+                onPress={() => navigation.navigate('MapScreen', {
+                    onSelect: (coords) => {
+                        setForm({ ...form, place: coords });
+                    }
+                })}
+            >
+                <Text style={{ fontFamily: FONT, fontSize: 16, lineHeight: 44, color: form.place ? '#222' : '#aaa' }}>
+                    {form.place || 'Choose place on map'}
+                </Text>
+            </TouchableOpacity>
+
 
             <View style={styles.buttonRow}>
                 <TouchableOpacity
