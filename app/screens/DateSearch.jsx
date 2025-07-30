@@ -31,6 +31,7 @@ export default function DateSearch({ navigation }) {
     const [events, setEvents] = useState([]); // filtered events to display
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [showDatePicker, setShowDatePicker] = useState({ mode: null, visible: false });
 
     // Format date for display (DD.MM.YYYY)
     const formatDate = (d) => {
@@ -145,64 +146,105 @@ export default function DateSearch({ navigation }) {
             </View>
 
             {/* Start date picker */}
-            <TouchableOpacity style={styles.input} onPress={() => setShowStart(true)}>
-                <Text style={styles.inputText}>
-                    {mode === 'single' ? 'Select day' : 'Start date'}: {formatDate(startDate)}
-                </Text>
-            </TouchableOpacity>
-            {showStart && (
-                <DateTimePicker
-                    value={startDate}
-                    mode="date"
-                    display="default"
-                    onChange={(_, date) => {
-                        setShowStart(false);
-                        if (date) setStartDate(date);
-                    }}
+            {Platform.OS === 'web' ? (
+                <input
+                    type="date"
+                    value={startDate.toISOString().slice(0, 10)}
+                    onChange={(e) => setStartDate(new Date(e.target.value))}
+                    style={styles.webInputDate}
                 />
-            )}
-
-            {/* End date picker, if range mode */}
-            {mode === 'range' && (
+            ) : (
                 <>
-                    <TouchableOpacity style={styles.input} onPress={() => setShowEnd(true)}>
-                        <Text style={styles.inputText}>End date: {formatDate(endDate)}</Text>
+                    <TouchableOpacity
+                        onPress={() =>
+                            setShowDatePicker(prev => ({
+                                mode: 'start',
+                                visible: prev.visible && prev.mode === 'start' ? false : true
+                            }))
+                        }
+                        style={styles.input}
+                    >
+                        <Text style={styles.inputText}>
+                            {mode === 'single' ? 'Select day' : 'Start date'}: {formatDate(startDate)}
+                        </Text>
                     </TouchableOpacity>
-                    {showEnd && (
+                    {showDatePicker.visible && showDatePicker.mode === 'start' && (
                         <DateTimePicker
-                            value={endDate}
+                            value={startDate}
                             mode="date"
-                            display="default"
-                            onChange={(_, date) => {
-                                setShowEnd(false);
-                                if (date) setEndDate(date);
+                            display={Platform.OS === 'ios' ? 'inline' : 'calendar'}
+                            onChange={(event, selectedDate) => {
+                                setShowDatePicker({mode: null, visible: false});
+                                if (selectedDate) setStartDate(selectedDate);
                             }}
                         />
                     )}
                 </>
             )}
 
+            {/* End date picker (range mode only) */}
+            {mode === 'range' && (
+                Platform.OS === 'web' ? (
+                    <input
+                        type="date"
+                        value={endDate.toISOString().slice(0, 10)}
+                        onChange={(e) => setEndDate(new Date(e.target.value))}
+                        style={styles.webInputDate}
+                    />
+                ) : (
+                    <>
+                        <TouchableOpacity
+                            onPress={() =>
+                                setShowDatePicker(prev => ({
+                                    mode: 'end',
+                                    visible: prev.visible && prev.mode === 'end' ? false : true
+                                }))
+                            }
+                            style={styles.input}
+                        >
+                            <Text style={styles.inputText}>
+                                End date: {formatDate(endDate)}
+                            </Text>
+                        </TouchableOpacity>
+                        {showDatePicker.visible && showDatePicker.mode === 'end' && (
+                            <DateTimePicker
+                                value={endDate}
+                                mode="date"
+                                display={Platform.OS === 'ios' ? 'inline' : 'calendar'}
+                                onChange={(event, selectedDate) => {
+                                    setShowDatePicker({mode: null, visible: false});
+                                    if (selectedDate) setEndDate(selectedDate);
+                                }}
+                            />
+                        )}
+                    </>
+                )
+            )}
+
             {/* Search button */}
             <TouchableOpacity
-                style={[primaryButton, { marginTop: 32, marginBottom: 16 }]}
+                style={[primaryButton, {marginTop: 32, marginBottom: 16}]}
                 onPress={handleSearch}
             >
                 <Text style={primaryButtonText}>Search</Text>
             </TouchableOpacity>
 
-
             {/* Events list */}
-            <ScrollView style={styles.eventsList} contentContainerStyle={{ paddingBottom: 80 }}>
-                {loading && <ActivityIndicator size="large" color="#007AFF" />}
+            <ScrollView style={styles.eventsList} contentContainerStyle={{paddingBottom: 80}}>
+                {loading && <ActivityIndicator size="large" color="#007AFF"/>}
                 {error && <Text style={styles.error}>{error}</Text>}
                 {!loading && events.length === 0 && !error && (
                     <Text style={styles.noEventsText}>No events found for the selected date(s).</Text>
                 )}
                 {events.map((event) => (
-                    <View key={event.id || event.name} style={styles.eventItem}>
+                    <TouchableOpacity
+                        key={event.id || event.name}
+                        style={styles.eventItem}
+                        onPress={() => navigation.navigate('EventDetails', {event: event.folder})}
+                    >
                         <Text style={styles.eventName}>{event.name}</Text>
                         <Text style={styles.eventDate}>{formatDate(event.parsedDate)}</Text>
-                    </View>
+                    </TouchableOpacity>
                 ))}
             </ScrollView>
 
@@ -287,5 +329,15 @@ const styles = StyleSheet.create({
         color: '#555',
         textAlign: 'center',
         marginVertical: 16,
+    },
+    webInputDate: {
+        fontFamily: FONT,
+        fontSize: 16,
+        height: 44,
+        paddingHorizontal: 10,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        marginVertical: 6,
     },
 });

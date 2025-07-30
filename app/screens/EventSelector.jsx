@@ -106,7 +106,7 @@ export default function EventSelector({ navigation }) {
                     style={secondaryButton}
                     onPress={() => navigation.navigate('Home')}
                 >
-                    <Text style={secondaryButtonText}>Cancel</Text>
+                    <Text style={secondaryButtonText}>Back</Text>
                 </TouchableOpacity>
 
                 <View>

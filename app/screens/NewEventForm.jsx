@@ -7,13 +7,14 @@ import {
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-}from '../components/constants';
-
+} from '../components/constants';
 
 async function sendEventToServer(form) {
     const generateId = () => Math.random().toString(36).substring(2, 10) + Date.now();
     const id = generateId();
     const csvLine = `${id};${form.name};${form.date};${form.time};${form.place}\n`;
+    const [showDatePicker, setShowDatePicker] = useState({ mode: null, visible: false });
+
 
     const response = await fetch('https://events-server-eu5z.onrender.com/api/events', {
         method: 'POST',
@@ -27,12 +28,10 @@ async function sendEventToServer(form) {
         }),
     });
 
-
     if (!response.ok) {
         throw new Error('Failed to save event');
     }
 }
-
 
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
@@ -45,6 +44,9 @@ export default function NewEventForm({ navigation }) {
         logo: null
     });
 
+    const [warning, setWarning] = useState('');
+    const [showDatePicker, setShowDatePicker] = useState({ mode: null, visible: false });
+
     const handlePickLogo = async () => {
         const result = await DocumentPicker.getDocumentAsync({
             type: 'image/png'
@@ -53,9 +55,6 @@ export default function NewEventForm({ navigation }) {
             setForm({ ...form, logo: result.assets[0] });
         }
     };
-    const [showDatePicker, setShowDatePicker] = useState({ mode: null, visible: false });
-
-
 
     const handleAccept = async () => {
         try {
@@ -66,7 +65,6 @@ export default function NewEventForm({ navigation }) {
             alert('Error saving event');
         }
     };
-
 
     return (
         <View style={styles.container}>
@@ -86,7 +84,6 @@ export default function NewEventForm({ navigation }) {
                 )}
             </TouchableOpacity>
 
-            {/*Date input*/}
             {Platform.OS === 'web' ? (
                 <input
                     type="date"
@@ -125,7 +122,6 @@ export default function NewEventForm({ navigation }) {
                 </>
             )}
 
-            {/*Time input*/}
             {Platform.OS === 'web' ? (
                 <input
                     type="time"
@@ -167,27 +163,46 @@ export default function NewEventForm({ navigation }) {
                 </>
             )}
 
-
-            {/*<TextInput*/}
-            {/*    style={styles.input}*/}
-            {/*    placeholder="Place"*/}
-            {/*    placeholderTextColor="#aaa"*/}
-            {/*    value={form.place}*/}
-            {/*    onChangeText={(text) => setForm({ ...form, place: text })}*/}
-            {/*/>*/}
-            <TouchableOpacity
+            <TextInput
                 style={styles.input}
-                onPress={() => navigation.navigate('MapScreen', {
-                    onSelect: (coords) => {
-                        setForm({ ...form, place: coords });
+                placeholder="Place"
+                placeholderTextColor="#aaa"
+                value={typeof form.place === 'string' ? form.place : ''}
+                editable={typeof form.place === 'string'}
+                onChangeText={(text) => {
+                    if (typeof form.place !== 'string' && form.place) {
+                        setWarning('Clear map selection to type a place.');
+                    } else {
+                        setWarning('');
+                        setForm({ ...form, place: text });
                     }
-                })}
+                }}
+            />
+
+            <TouchableOpacity
+                style={[styles.input, { opacity: typeof form.place === 'string' && form.place.length > 0 ? 0.5 : 1 }]}
+                disabled={typeof form.place === 'string' && form.place.length > 0}
+                onPress={() => {
+                    if (typeof form.place === 'string' && form.place.length > 0) {
+                        setWarning('Clear text input to choose a place on the map.');
+                    } else {
+                        setWarning('');
+                        navigation.navigate('MapScreen', {
+                            onSelect: (coords) => {
+                                setForm({ ...form, place: coords });
+                            }
+                        });
+                    }
+                }}
             >
                 <Text style={{ fontFamily: FONT, fontSize: 16, lineHeight: 44, color: form.place ? '#222' : '#aaa' }}>
-                    {form.place || 'Choose place on map'}
+                    {typeof form.place === 'object' ? 'Place selected on map' : (form.place || 'Choose place on map')}
                 </Text>
             </TouchableOpacity>
 
+            {warning ? (
+                <Text style={{ color: 'red', marginBottom: 8, fontFamily: FONT }}>{warning}</Text>
+            ) : null}
 
             <View style={styles.buttonRow}>
                 <TouchableOpacity
@@ -214,14 +229,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 24,
         paddingTop: 48,
         alignItems: 'center',
-    },
-    label: {
-        fontFamily: FONT,
-        fontSize: 16,
-        color: '#222',
-        alignSelf: 'flex-start',
-        marginBottom: 6,
-        letterSpacing: 1,
     },
     input: {
         width: 320,
