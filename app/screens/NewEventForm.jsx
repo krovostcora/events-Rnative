@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import {
+    primaryButton,
+    primaryButtonText,
+    secondaryButton,
+    secondaryButtonText,
+}from '../components/constants';
 
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
@@ -21,6 +29,7 @@ export default function NewEventForm({ navigation }) {
             setForm({ ...form, logo: result.assets[0] });
         }
     };
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
     const handleAccept = () => {
         navigation.navigate('EventSelector');
@@ -44,13 +53,40 @@ export default function NewEventForm({ navigation }) {
                 )}
             </TouchableOpacity>
 
-            <TextInput
-                style={styles.input}
-                placeholder="Date (YYYY-MM-DD)"
-                placeholderTextColor="#aaa"
-                value={form.date}
-                onChangeText={(text) => setForm({ ...form, date: text })}
-            />
+
+            {Platform.OS === 'web' ? (
+                <input
+                    type="date"
+                    value={form.date}
+                    onChange={(e) => setForm({ ...form, date: e.target.value })}
+                    style={styles.webInputDate}
+                />
+            ) : (
+                <>
+                    <TouchableOpacity
+                        onPress={() => setShowDatePicker(true)}
+                        style={styles.input}
+                    >
+                        <Text style={{ fontFamily: FONT, fontSize: 16, lineHeight: 44, color: form.date ? '#222' : '#aaa' }}>
+                            {form.date || 'Date (YYYY-MM-DD)'}
+                        </Text>
+                    </TouchableOpacity>
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={form.date ? new Date(form.date) : new Date()}
+                            mode="date"
+                            display={Platform.OS === 'ios' ? 'inline' : 'calendar'}
+                            onChange={(event, selectedDate) => {
+                                setShowDatePicker(false);
+                                if (selectedDate) {
+                                    setForm({ ...form, date: selectedDate.toISOString().slice(0, 10) });
+                                }
+                            }}
+                        />
+                    )}
+                </>
+            )}
+
             <TextInput
                 style={styles.input}
                 placeholder="Time (HH:MM)"
@@ -68,16 +104,16 @@ export default function NewEventForm({ navigation }) {
 
             <View style={styles.buttonRow}>
                 <TouchableOpacity
-                    style={styles.cancelButton}
+                    style={secondaryButton}
                     onPress={() => navigation.navigate('EventSelector')}
                 >
-                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                    <Text style={secondaryButtonText}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={styles.acceptButton}
+                    style={primaryButton}
                     onPress={handleAccept}
                 >
-                    <Text style={styles.acceptButtonText}>Accept</Text>
+                    <Text style={primaryButtonText}>Accept</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -143,38 +179,19 @@ const styles = StyleSheet.create({
         width: '100%',
         gap: 24,
     },
-    cancelButton: {
-        backgroundColor: '#e0e0e0',
+    webInputDate: {
+        width: 289,
+        height: 44,
         borderWidth: 1,
         borderColor: '#bbb',
-        borderRadius: 0,
-        paddingVertical: 14,
-        paddingHorizontal: 36,
-        minWidth: 120,
-        alignItems: 'center',
-    },
-    cancelButtonText: {
+        backgroundColor: '#fff',
+        fontFamily: FONT,
+        fontSize: 16,
         color: '#222',
-        fontFamily: FONT,
-        fontWeight: 'bold',
-        fontSize: 16,
-        letterSpacing: 1,
-    },
-    acceptButton: {
-        backgroundColor: '#111',
-        borderWidth: 1,
-        borderColor: '#bbb',
+        marginBottom: 14,
         borderRadius: 0,
-        paddingVertical: 14,
-        paddingHorizontal: 36,
-        minWidth: 120,
-        alignItems: 'center',
-    },
-    acceptButtonText: {
-        color: '#fff',
-        fontFamily: FONT,
-        fontWeight: 'bold',
-        fontSize: 16,
-        letterSpacing: 1,
-    },
+        paddingLeft: 15,
+        paddingRight: 15,
+    }
+
 });

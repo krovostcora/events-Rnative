@@ -1,5 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, Platform, Dimensions } from 'react-native';
+import {
+    primaryButton,
+    primaryButtonText,
+    secondaryButton,
+    secondaryButtonText,
+    toggleButton,
+    toggleButtonText,
+} from '../components/constants';
 
 export default function EventSelector({ navigation }) {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -27,7 +35,6 @@ export default function EventSelector({ navigation }) {
         }
     };
 
-    // Measure dropdown position for absolute dropdown list
     const onDropdownLayout = (e) => {
         const { y, height } = e.nativeEvent.layout;
         setDropdownTop(y + height);
@@ -36,10 +43,8 @@ export default function EventSelector({ navigation }) {
     return (
         <View style={styles.container}>
             <Text style={styles.label}>Select event</Text>
-            <View
-                ref={dropdownRef}
-                onLayout={onDropdownLayout}
-            >
+
+            <View ref={dropdownRef} onLayout={onDropdownLayout}>
                 <TouchableOpacity
                     style={styles.dropdown}
                     onPress={() => setDropdownOpen(prev => !prev)}
@@ -54,7 +59,12 @@ export default function EventSelector({ navigation }) {
             {dropdownOpen && (
                 <View style={[
                     styles.dropdownList,
-                    { position: 'absolute', top: dropdownTop, left: (Dimensions.get('window').width - 280) / 2, zIndex: 10 }
+                    {
+                        position: 'absolute',
+                        top: dropdownTop,
+                        left: (Dimensions.get('window').width - 280) / 2,
+                        zIndex: 10,
+                    }
                 ]}>
                     <FlatList
                         data={events}
@@ -79,37 +89,39 @@ export default function EventSelector({ navigation }) {
 
             <TouchableOpacity
                 style={[
-                    styles.acceptButton,
-                    !selectedEvent && styles.acceptButtonDisabled
+                    primaryButton,
+                    !selectedEvent && { opacity: 0.5 }
                 ]}
                 onPress={handleAccept}
                 disabled={!selectedEvent}
                 activeOpacity={selectedEvent ? 0.7 : 1}
             >
-                <Text style={styles.acceptButtonText}>Accept</Text>
+                <Text style={primaryButtonText}>Accept</Text>
             </TouchableOpacity>
 
             {loading && <Text style={styles.status}>Loading events...</Text>}
 
             <View style={styles.buttonRow}>
                 <TouchableOpacity
-                    style={styles.cancelButton}
+                    style={secondaryButton}
                     onPress={() => navigation.navigate('Home')}
                 >
-                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                    <Text style={secondaryButtonText}>Cancel</Text>
                 </TouchableOpacity>
+
                 <View>
                     <TouchableOpacity
-                        style={styles.newButton}
+                        style={[primaryButton]}
                         onPress={() => navigation.navigate('DateSearch')}
                     >
-                        <Text style={styles.newButtonText}>Search by date</Text>
+                        <Text style={primaryButtonText}>Search by date</Text>
                     </TouchableOpacity>
+
                     <TouchableOpacity
-                        style={[styles.newButton, { marginTop: 10 }]}
+                        style={[primaryButton, { marginTop: 10 }]}
                         onPress={() => navigation.navigate('NewEventForm')}
                     >
-                        <Text style={styles.newButtonText}>New event</Text>
+                        <Text style={primaryButtonText}>New event</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -175,27 +187,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#222',
     },
-    acceptButton: {
-        width: 280,
-        backgroundColor: '#222',
-        borderWidth: 2,
-        borderColor: '#bbb',
-        borderRadius: 0,
-        paddingVertical: 16,
-        alignItems: 'center',
-        marginTop: 200, // push Accept below center
-        marginBottom: 32,
-    },
-    acceptButtonDisabled: {
-        backgroundColor: '#888',
-    },
-    acceptButtonText: {
-        color: '#fff',
-        fontFamily: FONT,
-        fontWeight: 'bold',
-        fontSize: 18,
-        letterSpacing: 1,
-    },
     status: {
         marginTop: 10,
         fontFamily: FONT,
@@ -203,7 +194,6 @@ const styles = StyleSheet.create({
         color: '#555',
         fontSize: 14,
     },
-    // Update these styles in your StyleSheet
     buttonRow: {
         flexDirection: 'row',
         justifyContent: 'center',
@@ -214,40 +204,5 @@ const styles = StyleSheet.create({
         gap: 16,
         right: 0,
         width: '100%',
-    },
-    cancelButton: {
-        backgroundColor: '#e0e0e0',
-        borderWidth: 1,
-        borderColor: '#bbb',
-        borderRadius: 0,
-        paddingVertical: 14,
-        paddingHorizontal: 36,
-        minWidth: 120,
-        alignItems: 'center',
-    },
-    cancelButtonText: {
-        color: '#222',
-        fontFamily: FONT,
-        fontWeight: 'bold',
-        fontSize: 16,
-        letterSpacing: 1,
-    },
-    newButton: {
-        backgroundColor: '#111',
-        borderWidth: 1,
-        borderColor: '#bbb',
-        borderRadius: 0,
-        paddingVertical: 14,
-        paddingHorizontal: 36,
-        minWidth: 120,
-        maxWidth: 170,
-        alignItems: 'center',
-    },
-    newButtonText: {
-        color: '#fff',
-        fontFamily: FONT,
-        fontWeight: 'bold',
-        fontSize: 16,
-        letterSpacing: 1,
     },
 });

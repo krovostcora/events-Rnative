@@ -1,18 +1,24 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+    primaryButton,
+    primaryButtonText,
+    secondaryButton,
+    secondaryButtonText,
+}from '../components/constants';
 
 export default function HomeScreen({ navigation }) {
     return (
         <View style={styles.container}>
             {/* Pixel-art logo */}
             <View style={styles.logoContainer}>
-                {/* 5x5 grid, center square is red */}
+                {/* 5x5 grid */}
                 {[
-                    [1, 1, 1, 1, 1],
+                    [0, 1, 0, 1, 0],
                     [1, 0, 0, 0, 1],
-                    [1, 0, 2, 0, 1],
-                    [1, 0, 0, 0, 1],
-                    [1, 1, 1, 1, 1],
+                    [1, 0, 1, 0, 1],
+                    [1, 0, 0, 2, 1],
+                    [0, 1, 1, 1, 0],
                 ].map((row, rowIndex) => (
                     <View key={rowIndex} style={styles.logoRow}>
                         {row.map((cell, colIndex) => (
@@ -30,14 +36,14 @@ export default function HomeScreen({ navigation }) {
             </View>
             {/* Buttons */}
             <View style={styles.buttonRow}>
-                <TouchableOpacity style={styles.exitButton}>
-                    <Text style={styles.exitButtonText}>EXIT</Text>
+                <TouchableOpacity style={secondaryButton}>
+                    <Text style={secondaryButtonText}>EXIT</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={styles.startButton}
+                    style={primaryButton}
                     onPress={() => navigation.navigate('EventSelector')}
                 >
-                    <Text style={styles.startButtonText}>START</Text>
+                    <Text style={primaryButtonText}>START</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -76,40 +82,5 @@ const styles = StyleSheet.create({
     buttonRow: {
         flexDirection: 'row',
         gap: 24,
-    },
-    exitButton: {
-        backgroundColor: '#e0e0e0',
-        paddingVertical: 18,
-        paddingHorizontal: 40,
-        borderRadius: 0,
-        borderWidth: 2,
-        borderColor: '#bbb',
-        marginRight: 12,
-        minWidth: 120,
-        alignItems: 'center',
-    },
-    exitButtonText: {
-        color: '#222',
-        fontFamily: 'Menlo', // fallback to monospace
-        fontWeight: 'bold',
-        fontSize: 20,
-        letterSpacing: 2,
-    },
-    startButton: {
-        backgroundColor: '#111',
-        paddingVertical: 18,
-        paddingHorizontal: 40,
-        borderRadius: 0,
-        borderWidth: 2,
-        borderColor: '#bbb',
-        minWidth: 120,
-        alignItems: 'center',
-    },
-    startButtonText: {
-        color: '#fff',
-        fontFamily: 'Menlo',
-        fontWeight: 'bold',
-        fontSize: 20,
-        letterSpacing: 2,
     },
 });

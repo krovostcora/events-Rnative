@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform, Linking, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform, Linking } from 'react-native';
+import {
+    primaryButton,
+    primaryButtonText,
+    secondaryButton,
+    secondaryButtonText,
+    toggleButton,
+    toggleButtonText,
+} from '../components/constants';
 
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
@@ -55,7 +63,6 @@ export default function EventDetails({ route, navigation }) {
         );
     }
 
-    // Dummy link for location
     const handleLocationPress = () => {
         Linking.openURL('https://maps.google.com');
     };
@@ -76,34 +83,34 @@ export default function EventDetails({ route, navigation }) {
                     <Text style={styles.detailText}>{event.arrival}</Text>
                 </View>
             </View>
+
             <View style={styles.mapBox}>
                 <Text style={styles.mapText}>MAP / ROUTE PREVIEW</Text>
             </View>
-            {/* Manage registrations button centered above bottom */}
+
             <TouchableOpacity
-                style={styles.manageButton}
+                style={[primaryButton, { marginBottom: 80 }]}
                 onPress={() => {}}
             >
-                <Text style={styles.manageButtonText}>Manage registrations</Text>
+                <Text style={primaryButtonText}>Manage registrations</Text>
             </TouchableOpacity>
-            {/* Cancel bottom left */}
+
             <View style={styles.buttonRow}>
                 <TouchableOpacity
-                    style={styles.cancelButton}
+                    style={secondaryButton}
                     onPress={() => navigation.navigate('EventSelector')}
                 >
-                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                    <Text style={secondaryButtonText}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={styles.startButton}
+                    style={primaryButton}
                     onPress={() => navigation.navigate('ParticipantCard')}
                 >
-                    <Text style={styles.startButtonText}>Registrate</Text>
+                    <Text style={primaryButtonText}>Registrate</Text>
                 </TouchableOpacity>
             </View>
         </View>
     );
-
 }
 
 const styles = StyleSheet.create({
@@ -196,64 +203,6 @@ const styles = StyleSheet.create({
         right: 0,
         width: '100%',
         gap: 24,
-    },
-    manageButton: {
-        position: 'static',
-        left: 30,
-        right: 30,
-        bottom: 130, // adjust as needed to keep above the bottom buttons
-        marginLeft: 0,
-        marginRight: 0,
-        backgroundColor: '#444',
-        borderWidth: 1,
-        borderColor: '#bbb',
-        borderRadius: 0,
-        paddingVertical: 16,
-        paddingHorizontal: 15,
-        minWidth: 150,
-        alignItems: 'center',
-        alignSelf: 'center',
-    },
-    manageButtonText: {
-        color: '#fff',
-        fontFamily: FONT,
-        fontWeight: 'bold',
-        fontSize: 16,
-        letterSpacing: 1,
-    },
-    cancelButton: {
-        backgroundColor: '#e0e0e0',
-        borderWidth: 1,
-        borderColor: '#bbb',
-        borderRadius: 0,
-        paddingVertical: 16,
-        paddingHorizontal: 28,
-        minWidth: 110,
-        alignItems: 'center',
-    },
-    cancelButtonText: {
-        color: '#222',
-        fontFamily: FONT,
-        fontWeight: 'bold',
-        fontSize: 16,
-        letterSpacing: 1,
-    },
-    startButton: {
-        backgroundColor: '#111',
-        borderWidth: 1,
-        borderColor: '#bbb',
-        borderRadius: 0,
-        paddingVertical: 16,
-        paddingHorizontal: 28,
-        minWidth: 120,
-        alignItems: 'center',
-    },
-    startButtonText: {
-        color: '#fff',
-        fontFamily: FONT,
-        fontWeight: 'bold',
-        fontSize: 16,
-        letterSpacing: 1,
     },
     loading: {
         textAlign: 'center',

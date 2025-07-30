@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import {
+    primaryButton,
+    primaryButtonText,
+    secondaryButton,
+    secondaryButtonText,
+    toggleButton,
+    toggleButtonActive,
+    toggleButtonText,
+} from '../components/constants'; // шлях залежить від твоєї структури
 
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
@@ -26,24 +35,23 @@ export default function DateSearch({ navigation }) {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Search Events by Date</Text>
+
             <View style={styles.toggleRow}>
                 <TouchableOpacity
-                    style={[styles.toggleButton, mode === 'single' && styles.toggleButtonActive]}
+                    style={[toggleButton, mode === 'single' && toggleButtonActive]}
                     onPress={() => setMode('single')}
                 >
-                    <Text style={styles.toggleText}>Single Day</Text>
+                    <Text style={toggleButtonText}>Single Day</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={[styles.toggleButton, mode === 'range' && styles.toggleButtonActive]}
+                    style={[toggleButton, mode === 'range' && toggleButtonActive]}
                     onPress={() => setMode('range')}
                 >
-                    <Text style={styles.toggleText}>Date Range</Text>
+                    <Text style={toggleButtonText}>Date Range</Text>
                 </TouchableOpacity>
             </View>
-            <TouchableOpacity
-                style={styles.input}
-                onPress={() => setShowStart(true)}
-            >
+
+            <TouchableOpacity style={styles.input} onPress={() => setShowStart(true)}>
                 <Text style={styles.inputText}>
                     {mode === 'single' ? 'Select day' : 'Start date'}: {formatDate(startDate)}
                 </Text>
@@ -59,15 +67,11 @@ export default function DateSearch({ navigation }) {
                     }}
                 />
             )}
+
             {mode === 'range' && (
                 <>
-                    <TouchableOpacity
-                        style={styles.input}
-                        onPress={() => setShowEnd(true)}
-                    >
-                        <Text style={styles.inputText}>
-                            End date: {formatDate(endDate)}
-                        </Text>
+                    <TouchableOpacity style={styles.input} onPress={() => setShowEnd(true)}>
+                        <Text style={styles.inputText}>End date: {formatDate(endDate)}</Text>
                     </TouchableOpacity>
                     {showEnd && (
                         <DateTimePicker
@@ -82,17 +86,13 @@ export default function DateSearch({ navigation }) {
                     )}
                 </>
             )}
-            <TouchableOpacity
-                style={styles.acceptButton}
-                onPress={handleSearch}
-            >
-                <Text style={styles.acceptButtonText}>Search</Text>
+
+            <TouchableOpacity style={[primaryButton, { marginTop: 32, marginBottom: 16 }]} onPress={handleSearch}>
+                <Text style={primaryButtonText}>Search</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => navigation.goBack()}
-            >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+
+            <TouchableOpacity style={secondaryButton} onPress={() => navigation.goBack()}>
+                <Text style={secondaryButtonText}>Cancel</Text>
             </TouchableOpacity>
         </View>
     );
@@ -118,25 +118,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginBottom: 24,
     },
-    toggleButton: {
-        backgroundColor: '#e0e0e0',
-        borderWidth: 1,
-        borderColor: '#bbb',
-        borderRadius: 0,
-        paddingVertical: 12,
-        paddingHorizontal: 32,
-        marginHorizontal: 4,
-    },
-    toggleButtonActive: {
-        backgroundColor: '#111',
-    },
-    toggleText: {
-        color: '#fff',
-        fontFamily: FONT,
-        fontWeight: 'bold',
-        fontSize: 16,
-        letterSpacing: 1,
-    },
     input: {
         width: 280,
         height: 44,
@@ -152,40 +133,5 @@ const styles = StyleSheet.create({
         color: '#222',
         fontFamily: FONT,
         fontSize: 16,
-    },
-    acceptButton: {
-        width: 280,
-        backgroundColor: '#222',
-        borderWidth: 2,
-        borderColor: '#bbb',
-        borderRadius: 0,
-        paddingVertical: 16,
-        alignItems: 'center',
-        marginTop: 32,
-        marginBottom: 16,
-    },
-    acceptButtonText: {
-        color: '#fff',
-        fontFamily: FONT,
-        fontWeight: 'bold',
-        fontSize: 18,
-        letterSpacing: 1,
-    },
-    cancelButton: {
-        backgroundColor: '#e0e0e0',
-        borderWidth: 1,
-        borderColor: '#bbb',
-        borderRadius: 0,
-        paddingVertical: 14,
-        paddingHorizontal: 36,
-        minWidth: 120,
-        alignItems: 'center',
-    },
-    cancelButtonText: {
-        color: '#222',
-        fontFamily: FONT,
-        fontWeight: 'bold',
-        fontSize: 16,
-        letterSpacing: 1,
     },
 });

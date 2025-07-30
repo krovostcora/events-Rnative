@@ -9,6 +9,12 @@ import {
     ScrollView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import {
+    primaryButton,
+    primaryButtonText,
+    secondaryButton,
+    secondaryButtonText,
+}from '../components/constants';
 
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
@@ -154,11 +160,11 @@ export default function ParticipantCard({ navigation }) {
 
             </ScrollView>
             <View style={styles.buttonRow}>
-                <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                <TouchableOpacity style={secondaryButton} onPress={handleCancel}>
+                    <Text style={secondaryButtonText}>Cancel</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.acceptButton} onPress={handleSubmit}>
-                    <Text style={styles.acceptButtonText}>Submit</Text>
+                <TouchableOpacity style={primaryButton} onPress={handleSubmit}>
+                    <Text style={primaryButtonText}>Submit</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -213,39 +219,5 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 36,
         left: 24,
-    },
-    cancelButton: {
-        backgroundColor: '#e0e0e0',
-        borderWidth: 1,
-        borderColor: '#bbb',
-        borderRadius: 0,
-        paddingVertical: 14,
-        paddingHorizontal: 36,
-        minWidth: 120,
-        alignItems: 'center',
-    },
-    cancelButtonText: {
-        color: '#222',
-        fontFamily: FONT,
-        fontWeight: 'bold',
-        fontSize: 16,
-        letterSpacing: 1,
-    },
-    acceptButton: {
-        backgroundColor: '#111',
-        borderWidth: 1,
-        borderColor: '#bbb',
-        borderRadius: 0,
-        paddingVertical: 14,
-        paddingHorizontal: 36,
-        minWidth: 120,
-        alignItems: 'center',
-    },
-    acceptButtonText: {
-        color: '#fff',
-        fontFamily: FONT,
-        fontWeight: 'bold',
-        fontSize: 16,
-        letterSpacing: 1,
     },
 });
