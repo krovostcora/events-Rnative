@@ -8,7 +8,6 @@ import {
     Platform,
     ScrollView,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import {
     primaryButton,
     primaryButtonText,
@@ -25,30 +24,41 @@ const genderOptions = [
     { label: 'Other', value: 'other' },
 ];
 
-function GenderSelect({ value, onChange, style }) {
+function GenderRadio({ value, onChange }) {
+    const options = [
+        { label: 'M', value: 'male' },
+        { label: 'F', value: 'female' },
+        { label: 'Other', value: 'other' },
+    ];
     return (
-        <Picker
-            selectedValue={value}
-            onValueChange={onChange}
-            style={[style, { color: value ? '#222' : '#aaa' }]}
-        >
-            {genderOptions.map((option) => (
-                <Picker.Item
-                    key={option.value}
-                    label={option.label}
-                    value={option.value}
-                />
+        <View style={styles.genderRow}>
+            {options.map(opt => (
+                <TouchableOpacity
+                    key={opt.value}
+                    style={[
+                        styles.radioButton,
+                        value === opt.value && styles.radioSelected
+                    ]}
+                    onPress={() => onChange(opt.value)}
+                    activeOpacity={0.7}
+                >
+                    <View style={[
+                        styles.radioCircle,
+                        value === opt.value && styles.radioCircleSelected
+                    ]}/>
+                    <Text style={styles.radioLabel}>{opt.label}</Text>
+                </TouchableOpacity>
             ))}
-        </Picker>
+        </View>
     );
 }
+
 
 export default function ParticipantCard({ navigation }) {
     const [form, setForm] = useState({
         name: '',
         surname: '',
         age: '',
-        dni: '',
         email: '',
         phone: '',
         gender: '',
@@ -64,15 +74,17 @@ export default function ParticipantCard({ navigation }) {
         if (name === 'name' || name === 'surname') {
             errors[name] = value.trim() === '' ? `${name} is required` : '';
         } else if (name === 'age') {
-            errors[name] = !value || value <= 0 ? 'Age must be a positive number' : '';
+            errors.age = !value || value <= 0
+                ? 'Age must be a positive number'
+                : value > 150
+                    ? 'Age must not exceed 150'
+                    : '';
         } else if (name === 'email') {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             errors[name] = value && !emailRegex.test(value) ? 'Invalid email format' : '';
         } else if (name === 'phone') {
             const phoneRegex = /^[0-9]*$/;
             errors[name] = value && !phoneRegex.test(value) ? 'Phone must contain only digits' : '';
-        } else if (name === 'dni') {
-            errors[name] = value.trim() === '' ? 'DNI is required' : '';
         }
 
         setValidationErrors(errors);
@@ -82,8 +94,11 @@ export default function ParticipantCard({ navigation }) {
         let errors = {};
         if (!form.name.trim()) errors.name = 'Name is required';
         if (!form.surname.trim()) errors.surname = 'Surname is required';
-        if (!form.age || form.age <= 0) errors.age = 'Age must be a positive number';
-        if (!form.dni.trim()) errors.dni = 'DNI is required';
+        if (!form.age || form.age <= 0) {
+            errors.age = 'Age must be a positive number';
+        } else if (form.age > 150) {
+            errors.age = 'Age must not exceed 150';
+        }
 
         setValidationErrors(errors);
 
@@ -118,6 +133,16 @@ export default function ParticipantCard({ navigation }) {
                 />
                 {validationErrors.surname ? <Text style={styles.error}>{validationErrors.surname}</Text> : null}
 
+
+                <View style={styles.genderRow}>
+                    <Text style={styles.genderLabel}>Gender:</Text>
+                    <GenderRadio
+                        value={form.gender}
+                        onChange={v => handleChange('gender', v)}
+                    />
+                </View>
+                {validationErrors.gender ? <Text style={styles.error}>{validationErrors.gender}</Text> : null}
+
                 <TextInput
                     style={styles.input}
                     placeholder="Age *"
@@ -127,15 +152,6 @@ export default function ParticipantCard({ navigation }) {
                     keyboardType="numeric"
                 />
                 {validationErrors.age ? <Text style={styles.error}>{validationErrors.age}</Text> : null}
-
-                <TextInput
-                    style={styles.input}
-                    placeholder="DNI *"
-                    placeholderTextColor="#aaa"
-                    value={form.dni}
-                    onChangeText={(v) => handleChange('dni', v)}
-                />
-                {validationErrors.dni ? <Text style={styles.error}>{validationErrors.dni}</Text> : null}
 
                 <TextInput
                     style={styles.input}
@@ -157,6 +173,7 @@ export default function ParticipantCard({ navigation }) {
                     keyboardType="phone-pad"
                 />
                 {validationErrors.phone ? <Text style={styles.error}>{validationErrors.phone}</Text> : null}
+
 
             </ScrollView>
             <View style={styles.buttonRow}>
@@ -203,6 +220,8 @@ const styles = StyleSheet.create({
         color: '#222',
         marginBottom: 10,
         paddingHorizontal: 12,
+        paddingVertical: 10,
+        marginVertical: 12,
         borderRadius: 0,
     },
     error: {
@@ -220,4 +239,41 @@ const styles = StyleSheet.create({
         bottom: 36,
         left: 24,
     },
+    genderRow: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 12,
+        marginTop: 12,
+    },
+    radioButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginRight: 24,
+    },
+    radioCircle: {
+        width: 18,
+        height: 18,
+        borderRadius: 9,
+        borderWidth: 2,
+        borderColor: '#bbb',
+        backgroundColor: '#fff',
+        marginRight: 6,
+    },
+    radioCircleSelected: {
+        borderColor: '#000000',
+        backgroundColor: '#1c1c1c',
+    },
+    genderLabel: {
+        fontFamily: FONT,
+        fontSize: 16,
+        color: '#222',
+        marginRight: 18,
+        alignSelf: 'center',
+    },
+    radioLabel: {
+        fontFamily: FONT,
+        fontSize: 16,
+        color: '#222',
+    },
+    radioSelected: {},
 });
