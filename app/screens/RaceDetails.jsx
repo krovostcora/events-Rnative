@@ -1,6 +1,6 @@
 // app/screens/RaceDetails.jsx
 import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Modal } from 'react-native';
 import {
     optionsButton,
     optionsButtonText,
@@ -18,6 +18,8 @@ export default function RaceDetails({ navigation }) {
     const [time, setTime] = useState(0);
     const [entries, setEntries] = useState([]);
     const timerRef = useRef(null);
+    const [editIndex, setEditIndex] = useState(null);
+    const [editEntry, setEditEntry] = useState({ id: '', time: '' });
 
     const formatTime = (t) => {
         const seconds = Math.floor(t / 1000) % 60;
@@ -56,12 +58,64 @@ export default function RaceDetails({ navigation }) {
         setRunning(!running);
     };
 
-    const renderRow = ({ item }) => (
+    const handleEdit = (index) => {
+        setEditIndex(index);
+        setEditEntry(entries[index]);
+    };
+
+    const handleSaveEdit = () => {
+        const updated = [...entries];
+        updated[editIndex] = { ...editEntry };
+        setEntries(updated);
+        setEditIndex(null);
+    };
+
+    const handleDelete = (index) => {
+        const updated = entries.filter((_, i) => i !== index);
+        setEntries(updated);
+    };
+
+    const renderRow = ({ item, index }) => (
         <View style={styles.row}>
-            <Text style={styles.cell}>{item.id}</Text>
-            <Text style={styles.cell}>{item.time}</Text>
+            {editIndex === index ? (
+                <>
+                    <TextInput
+                        style={styles.cellId}
+                        value={editEntry.id}
+                        onChangeText={id => setEditEntry({ ...editEntry, id })}
+                    />
+                    <TextInput
+                        style={styles.cellTime}
+                        value={editEntry.time}
+                        onChangeText={time => setEditEntry({ ...editEntry, time })}
+                    />
+                    <View style={styles.cellOptions}>
+                        <TouchableOpacity onPress={handleSaveEdit}>
+                            <Text style={{ color: 'green', padding: 6 }}>Save</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setEditIndex(null)}>
+                            <Text style={{ color: 'red', padding: 6 }}>Cancel</Text>
+                        </TouchableOpacity>
+                    </View>
+                </>
+            ) : (
+                <>
+                    <Text style={styles.cellId}>{item.id}</Text>
+                    <Text style={styles.cellTime}>{item.time}</Text>
+                    <View style={styles.cellOptions}>
+                        <TouchableOpacity onPress={() => handleEdit(index)}>
+                            <Text style={{ color: 'blue', padding: 6 }}>Edit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => handleDelete(index)}>
+                            <Text style={{ color: 'red', padding: 6 }}>Delete</Text>
+                        </TouchableOpacity>
+                    </View>
+                </>
+            )}
         </View>
     );
+
+
 
     return (
         <View style={styles.container}>
@@ -73,11 +127,12 @@ export default function RaceDetails({ navigation }) {
                 renderItem={renderRow}
                 keyExtractor={(item, index) => index.toString()}
                 ListHeaderComponent={
-                    <View style={styles.headerRow}>
-                        <Text style={styles.headerCell}>ID</Text>
-                        <Text style={styles.headerCell}>Time</Text>
-                    </View>
-                }
+                                     <View style={styles.headerRow}>
+                                         <Text style={styles.headerCellId}>ID</Text>
+                                         <Text style={styles.headerCellTime}>Time</Text>
+                                         <Text style={styles.headerCellOptions}>Options</Text>
+                                     </View>
+                                 }
             />
 
             <TouchableOpacity style={primaryButton} onPress={toggleTimer}>
@@ -95,6 +150,7 @@ export default function RaceDetails({ navigation }) {
                     <Text style={optionsButtonText}>Save</Text>
                 </TouchableOpacity>
             </View>
+
             <TouchableOpacity style={secondaryButton} onPress={() => navigation.goBack()}>
                 <Text style={secondaryButtonText}>Back</Text>
             </TouchableOpacity>
@@ -122,12 +178,25 @@ const styles = StyleSheet.create({
         borderColor: '#000',
         backgroundColor: '#fff',
     },
-    cell: {
-        flex: 1,
+    cellId: {
+        width: '20%',
         fontSize: 16,
         padding: 6,
         borderRightWidth: 1,
         borderColor: '#000',
+    },
+    cellTime: {
+        width: '35%',
+        fontSize: 16,
+        padding: 6,
+        borderRightWidth: 1,
+        borderColor: '#000',
+    },
+    cellOptions: {
+        width: '45%',
+        fontSize: 16,
+        padding: 6,
+        flexDirection: 'row',
     },
     headerRow: {
         flexDirection: 'row',
@@ -135,13 +204,27 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: '#000',
     },
-    headerCell: {
-        flex: 1,
+    headerCellId: {
+        width: '20%',
         fontWeight: 'bold',
         fontSize: 16,
         padding: 6,
         borderRightWidth: 1,
         borderColor: '#000',
+    },
+    headerCellTime: {
+        width: '35%',
+        fontWeight: 'bold',
+        fontSize: 16,
+        padding: 6,
+        borderRightWidth: 1,
+        borderColor: '#000',
+    },
+    headerCellOptions: {
+        width: '45%',
+        fontWeight: 'bold',
+        fontSize: 16,
+        padding: 6,
     },
     controls: {
         marginVertical: 16,
