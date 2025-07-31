@@ -20,6 +20,35 @@ export default function RaceDetails({ navigation }) {
     const timerRef = useRef(null);
     const [editIndex, setEditIndex] = useState(null);
     const [editEntry, setEditEntry] = useState({ id: '', time: '' });
+    const [sortBy, setSortBy] = useState(null);
+    const [sortOrder, setSortOrder] = useState('asc');
+
+    const sortEntries = (column) => {
+        let order = sortOrder;
+        if (sortBy === column) {
+            order = sortOrder === 'asc' ? 'desc' : 'asc';
+            setSortOrder(order);
+        } else {
+            setSortBy(column);
+            setSortOrder('asc');
+            order = 'asc';
+        }
+        const sorted = [...entries].sort((a, b) => {
+            if (column === 'id') {
+                // Remove '#' and compare as numbers
+                const aId = parseInt(a.id.replace('#', ''), 10);
+                const bId = parseInt(b.id.replace('#', ''), 10);
+                return order === 'asc' ? aId - bId : bId - aId;
+            } else if (column === 'time') {
+                // Compare time strings as HH:MM:SS
+                return order === 'asc'
+                    ? a.time.localeCompare(b.time)
+                    : b.time.localeCompare(a.time);
+            }
+            return 0;
+        });
+        setEntries(sorted);
+    };
 
     const formatTime = (t) => {
         const seconds = Math.floor(t / 1000) % 60;
@@ -80,40 +109,41 @@ export default function RaceDetails({ navigation }) {
             {editIndex === index ? (
                 <>
                     <TextInput
-                        style={styles.cellId}
                         value={editEntry.id}
-                        onChangeText={id => setEditEntry({ ...editEntry, id })}
+                        style={[styles.cellId, { flex: 0.6 }]}
+                        onChangeText={(id) => setEditEntry({ ...editEntry, id })}
                     />
                     <TextInput
-                        style={styles.cellTime}
                         value={editEntry.time}
-                        onChangeText={time => setEditEntry({ ...editEntry, time })}
+                        style={[styles.cellTime, { flex: 1.1 }]}
+                        onChangeText={(time) => setEditEntry({ ...editEntry, time })}
                     />
-                    <View style={styles.cellOptions}>
+                    <View style={[styles.cellOptions, { flex: 2 }]}>
                         <TouchableOpacity onPress={handleSaveEdit}>
-                            <Text style={{ color: 'green', padding: 6 }}>Save</Text>
+                            <Text style={styles.editButton}>Save</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => setEditIndex(null)}>
-                            <Text style={{ color: 'red', padding: 6 }}>Cancel</Text>
+                            <Text style={styles.cancelButton}>Cancel</Text>
                         </TouchableOpacity>
                     </View>
                 </>
             ) : (
                 <>
-                    <Text style={styles.cellId}>{item.id}</Text>
-                    <Text style={styles.cellTime}>{item.time}</Text>
-                    <View style={styles.cellOptions}>
+                    <Text style={[styles.cellId, { flex: 0.6 }]}>{item.id}</Text>
+                    <Text style={[styles.cellTime, { flex: 1.1 }]}>{item.time}</Text>
+                    <View style={[styles.cellOptions, { flex: 2 }]}>
                         <TouchableOpacity onPress={() => handleEdit(index)}>
-                            <Text style={{ color: 'blue', padding: 6 }}>Edit</Text>
+                            <Text style={styles.editButton}>Edit</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => handleDelete(index)}>
-                            <Text style={{ color: 'red', padding: 6 }}>Delete</Text>
+                            <Text style={styles.deleteButton}>Delete</Text>
                         </TouchableOpacity>
                     </View>
                 </>
             )}
         </View>
     );
+
 
 
 
@@ -127,12 +157,32 @@ export default function RaceDetails({ navigation }) {
                 renderItem={renderRow}
                 keyExtractor={(item, index) => index.toString()}
                 ListHeaderComponent={
-                                     <View style={styles.headerRow}>
-                                         <Text style={styles.headerCellId}>ID</Text>
-                                         <Text style={styles.headerCellTime}>Time</Text>
-                                         <Text style={styles.headerCellOptions}>Options</Text>
-                                     </View>
-                                 }
+                    <View style={styles.headerRow}>
+                        <TouchableOpacity
+                            style={[styles.headerCell, { flex: 0.6 }]}
+                            onPress={() => sortEntries('id')}
+                        >
+                            <Text style={styles.headerText}>
+                                <Text style={styles.headerBold}>ID</Text>
+                                {' '}{sortBy === 'id' ? (sortOrder === 'asc' ? '↑' : '↓') : '↕'}
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={[styles.headerCell, { flex: 1.1 }]}
+                            onPress={() => sortEntries('time')}
+                        >
+                            <Text style={styles.headerText}>
+                                <Text style={styles.headerBold}>Time</Text>
+                                {' '}{sortBy === 'time' ? (sortOrder === 'asc' ? '↑' : '↓') : '↕'}
+                            </Text>
+                        </TouchableOpacity>
+
+                        <View style={[styles.headerCell, { flex: 2 }]}>
+                            <Text style={styles.headerBold}>Options</Text>
+                        </View>
+                    </View>
+                }
             />
 
             <TouchableOpacity style={primaryButton} onPress={toggleTimer}>
@@ -163,68 +213,77 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#eee',
         padding: 12,
-        margin: 8,
     },
     timerDisplay: {
         fontSize: 24,
         textAlign: 'center',
         marginVertical: 16,
-        padding: 6,
         backgroundColor: '#fff',
-    },
-    row: {
-        flexDirection: 'row',
-        borderTopWidth: 1,
-        borderColor: '#000',
-        backgroundColor: '#fff',
-    },
-    cellId: {
-        width: '20%',
-        fontSize: 16,
-        padding: 6,
-        borderRightWidth: 1,
-        borderColor: '#000',
-    },
-    cellTime: {
-        width: '35%',
-        fontSize: 16,
-        padding: 6,
-        borderRightWidth: 1,
-        borderColor: '#000',
-    },
-    cellOptions: {
-        width: '45%',
-        fontSize: 16,
-        padding: 6,
-        flexDirection: 'row',
+        padding: 10,
+        borderRadius: 6,
+        elevation: 2,
     },
     headerRow: {
         flexDirection: 'row',
-        backgroundColor: '#ddd',
+        backgroundColor: '#ccc',
+        borderTopWidth: 1,
         borderBottomWidth: 1,
-        borderColor: '#000',
+        borderColor: '#888',
     },
-    headerCellId: {
-        width: '20%',
-        fontWeight: 'bold',
-        fontSize: 16,
-        padding: 6,
+    headerCell: {
+        flex: 1,
+        paddingVertical: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
         borderRightWidth: 1,
-        borderColor: '#000',
+        borderColor: 'transparent',
     },
-    headerCellTime: {
-        width: '35%',
-        fontWeight: 'bold',
+    headerText: {
         fontSize: 16,
-        padding: 6,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    row: {
+        flexDirection: 'row',
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderColor: '#ccc',
+        minHeight: 50,
+        alignItems: 'center',
+    },
+    cellId: {
+        flex: 1,
+        paddingVertical: 10,
+        textAlign: 'center',
         borderRightWidth: 1,
-        borderColor: '#000',
-    },
-    headerCellOptions: {
-        width: '45%',
-        fontWeight: 'bold',
+        borderColor: '#ccc',
         fontSize: 16,
-        padding: 6,
+    },
+    cellTime: {
+        flex: 1,
+        paddingVertical: 10,
+        textAlign: 'center',
+        borderRightWidth: 1,
+        borderColor: '#ccc',
+        fontSize: 16,
+    },
+    cellOptions: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 12,
+    },
+    editButton: {
+        color: '#007AFF',
+        fontSize: 15,
+    },
+    deleteButton: {
+        color: '#D00',
+        fontSize: 15,
+    },
+    cancelButton: {
+        color: '#999',
+        fontSize: 15,
     },
     controls: {
         marginVertical: 16,
@@ -232,4 +291,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         gap: 12,
     },
+    headerBold: {
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
 });
+
+
