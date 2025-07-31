@@ -86,7 +86,6 @@ export default function EventDetails({ route, navigation }) {
                 </View>
             </View>
 
-            {/* Race button, only if it's a race */}
             {event.isRace && (
                 <TouchableOpacity
                     style={[primaryButton, {marginTop: 24, marginBottom: 12}]}
@@ -97,13 +96,45 @@ export default function EventDetails({ route, navigation }) {
             )}
             <TouchableOpacity
                 style={[primaryButton, {marginBottom: 80}]}
-                onPress={() => {
-                }}
+                onPress={() => {}}
             >
                 <Text style={primaryButtonText}>Manage registrations</Text>
             </TouchableOpacity>
 
-            <View style={styles.buttonRow}>
+            <View style={styles.moreDetailsBox}>
+                <Text style={styles.sectionLabel}>Event details:</Text>
+                {event.ageLimit && event.ageLimit !== 'none' && event.ageLimit !== '0' && (
+                    <Text style={styles.moreDetailText}>
+                        Age limit: {event.ageLimit === '18+' ? '18+' :
+                        event.ageLimit === 'children' ? `For children only${event.maxChildAge && event.maxChildAge !== '0' ? ` (max age: ${event.maxChildAge})` : ''}` :
+                            event.ageLimit}
+                    </Text>
+                )}
+                {event.medicalRequired && event.medicalRequired !== 'no' && event.medicalRequired !== '0' && (
+                    <Text style={styles.moreDetailText}>
+                        Medical certificate: Required
+                    </Text>
+                )}
+                {event.teamEvent && event.teamEvent !== 'no' && event.teamEvent !== '0' && (
+                    <Text style={styles.moreDetailText}>
+                        Team event: Yes
+                    </Text>
+                )}
+                {event.genderRestriction && event.genderRestriction !== 'any' && event.genderRestriction !== 'no' && (
+                    <Text style={styles.moreDetailText}>
+                        Gender restriction: {event.genderRestriction.charAt(0).toUpperCase() + event.genderRestriction.slice(1)}
+                    </Text>
+                )}
+            </View>
+
+            {event.description && event.description.trim() !== '' && (
+                <View style={styles.descriptionBox}>
+                    <Text style={styles.descriptionLabel}>Event description:</Text>
+                    <Text style={styles.descriptionText}>{event.description}</Text>
+                </View>
+            )}
+
+            <View style={[styles.buttonRow, { marginTop: 60 }]}>
                 <TouchableOpacity
                     style={secondaryButton}
                     onPress={() => navigation.navigate('EventSelector')}
@@ -159,7 +190,6 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
     },
-
     detailsBox: {
         justifyContent: 'center',
     },
@@ -169,24 +199,40 @@ const styles = StyleSheet.create({
         color: '#222',
         marginBottom: 6,
     },
+    sectionLabel: {
+        fontFamily: FONT,
+        fontSize: 15,
+        fontWeight: 'bold',
+        color: '#555',
+        marginBottom: 8,
+    },
+    moreDetailsBox: {
+        width: '100%',
+        marginTop: 18,
+        padding: 14,
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 2,
+        marginBottom: 8,
+    },
+    moreDetailText: {
+        fontFamily: FONT,
+        fontSize: 16,
+        color: '#222',
+        marginBottom: 10,
+        fontWeight: '500',
+    },
     linkText: {
         fontFamily: FONT,
         fontSize: 16,
         color: '#007AFF',
         textDecorationLine: 'underline',
-    },
-    mapBox: {
-        width: '100%',
-        height: 150,
-        backgroundColor: '#ddd',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 24,
-    },
-    mapText: {
-        fontFamily: FONT,
-        fontSize: 16,
-        color: '#444',
     },
     buttonRow: {
         flexDirection: 'row',
@@ -202,5 +248,32 @@ const styles = StyleSheet.create({
         fontFamily: FONT,
         fontSize: 16,
         color: '#555',
+    },
+    descriptionBox: {
+        width: '100%',
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+        padding: 14,
+        marginTop: 8,
+        marginBottom: 12,
+        shadowColor: '#000',
+        shadowOpacity: 0.04,
+        shadowRadius: 3,
+        shadowOffset: { width: 0, height: 1 },
+        elevation: 1,
+    },
+    descriptionLabel: {
+        fontFamily: FONT,
+        fontSize: 15,
+        fontWeight: 'bold',
+        color: '#444',
+        marginBottom: 6,
+    },
+    descriptionText: {
+        fontFamily: FONT,
+        fontSize: 15,
+        color: '#222',
     },
 });

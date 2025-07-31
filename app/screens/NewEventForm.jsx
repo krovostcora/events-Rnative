@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, ScrollView} from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {
@@ -9,12 +9,12 @@ import {
     secondaryButtonText,
 } from '../components/constants';
 
+const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
+
 async function sendEventToServer(form) {
     const generateId = () => Math.random().toString(36).substring(2, 10) + Date.now();
     const id = generateId();
     const csvLine = `${id};${form.name};${form.date};${form.time};${form.place}\n`;
-    const [showDatePicker, setShowDatePicker] = useState({ mode: null, visible: false });
-
 
     const response = await fetch('https://events-server-eu5z.onrender.com/api/events', {
         method: 'POST',
@@ -25,7 +25,13 @@ async function sendEventToServer(form) {
             name: form.name,
             time: form.time,
             place: form.place,
-            isRace: false
+            isRace: form.isRace,
+            ageLimit: form.ageLimit,
+            maxChildAge: form.maxChildAge,
+            medicalRequired: form.medicalRequired,
+            teamEvent: form.teamEvent,
+            genderRestriction: form.genderRestriction,
+            description: form.description,
         }),
     });
 
@@ -34,24 +40,27 @@ async function sendEventToServer(form) {
     }
 }
 
-const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
-
 export default function NewEventForm({ navigation }) {
     const [form, setForm] = useState({
         name: '',
         date: '',
         time: '',
         place: '',
-        logo: null
+        logo: null,
+        isRace: false,
+        ageLimit: 'none',
+        maxChildAge: '',
+        medicalRequired: false,
+        teamEvent: false,
+        genderRestriction: 'any',
+        description: '',
     });
 
     const [warning, setWarning] = useState('');
     const [showDatePicker, setShowDatePicker] = useState({ mode: null, visible: false });
 
     const handlePickLogo = async () => {
-        const result = await DocumentPicker.getDocumentAsync({
-            type: 'image/png'
-        });
+        const result = await DocumentPicker.getDocumentAsync({ type: 'image/png' });
         if (!result.canceled) {
             setForm({ ...form, logo: result.assets[0] });
         }
@@ -62,44 +71,40 @@ export default function NewEventForm({ navigation }) {
             await sendEventToServer(form);
             navigation.navigate('EventSelector');
         } catch (err) {
-            console.error('Failed to send event:', err);
             alert('Error saving event');
         }
     };
 
     return (
         <View style={styles.container}>
+            <ScrollView >
             <TextInput
                 style={styles.input}
                 value={form.name}
-                onChangeText={(text) => setForm({ ...form, name: text })}
+                onChangeText={text => setForm({ ...form, name: text })}
                 placeholder="Write the name of the event"
                 placeholderTextColor="#aaa"
             />
 
             <TouchableOpacity style={styles.logoBox} onPress={handlePickLogo} activeOpacity={0.7}>
-                {form.logo ? (
-                    <Text style={styles.logoText}>{form.logo.name}</Text>
-                ) : (
-                    <Text style={styles.logoText}>Upload logo (.png)</Text>
-                )}
+                <Text style={styles.logoText}>
+                    {form.logo ? form.logo.name : 'Upload logo (.png)'}
+                </Text>
             </TouchableOpacity>
 
+            {/* Date Picker */}
             {Platform.OS === 'web' ? (
                 <input
                     type="date"
                     value={form.date}
-                    onChange={(e) => setForm({ ...form, date: e.target.value })}
+                    onChange={e => setForm({ ...form, date: e.target.value })}
                     style={styles.webInputDate}
                 />
             ) : (
                 <>
                     <TouchableOpacity
                         onPress={() =>
-                            setShowDatePicker(prev => ({
-                                mode: 'date',
-                                visible: prev.visible && prev.mode === 'date' ? false : true
-                            }))
+                            setShowDatePicker({ mode: 'date', visible: true })
                         }
                         style={styles.input}
                     >
@@ -123,21 +128,19 @@ export default function NewEventForm({ navigation }) {
                 </>
             )}
 
+            {/* Time Picker */}
             {Platform.OS === 'web' ? (
                 <input
                     type="time"
                     value={form.time}
-                    onChange={(e) => setForm({ ...form, time: e.target.value })}
+                    onChange={e => setForm({ ...form, time: e.target.value })}
                     style={styles.webInputDate}
                 />
             ) : (
                 <>
                     <TouchableOpacity
                         onPress={() =>
-                            setShowDatePicker(prev => ({
-                                mode: 'time',
-                                visible: prev.visible && prev.mode === 'time' ? false : true
-                            }))
+                            setShowDatePicker({ mode: 'time', visible: true })
                         }
                         style={styles.input}
                     >
@@ -164,13 +167,14 @@ export default function NewEventForm({ navigation }) {
                 </>
             )}
 
+            {/* Place Input and Map Picker */}
             <TextInput
                 style={styles.input}
                 placeholder="Place"
                 placeholderTextColor="#aaa"
                 value={typeof form.place === 'string' ? form.place : ''}
                 editable={typeof form.place === 'string'}
-                onChangeText={(text) => {
+                onChangeText={text => {
                     if (typeof form.place !== 'string' && form.place) {
                         setWarning('Clear map selection to type a place.');
                     } else {
@@ -179,7 +183,6 @@ export default function NewEventForm({ navigation }) {
                     }
                 }}
             />
-
             <TouchableOpacity
                 style={[styles.input, { opacity: typeof form.place === 'string' && form.place.length > 0 ? 0.5 : 1 }]}
                 disabled={typeof form.place === 'string' && form.place.length > 0}
@@ -189,9 +192,7 @@ export default function NewEventForm({ navigation }) {
                     } else {
                         setWarning('');
                         navigation.navigate('MapScreen', {
-                            onSelect: (coords) => {
-                                setForm({ ...form, place: coords });
-                            }
+                            onSelect: coords => setForm({ ...form, place: coords }),
                         });
                     }
                 }}
@@ -200,38 +201,102 @@ export default function NewEventForm({ navigation }) {
                     {typeof form.place === 'object' ? 'Place selected on map' : (form.place || 'Choose place on map')}
                 </Text>
             </TouchableOpacity>
-
             {warning ? (
                 <Text style={{ color: 'red', marginBottom: 8, fontFamily: FONT }}>{warning}</Text>
             ) : null}
 
-            {/*car race*/}
+            {/* Race Toggle */}
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 14 }}>
                 <TouchableOpacity
                     onPress={() => setForm({ ...form, isRace: !form.isRace })}
-                    style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: 12,
-                        borderWidth: 2,
-                        borderColor: '#000000',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginRight: 8,
-                    }}
+                    style={styles.radioOuter}
                 >
-                    {form.isRace && (
-                        <View style={{
-                            width: 12,
-                            height: 12,
-                            borderRadius: 6,
-                            backgroundColor: '#1c1c1c',
-                        }} />
-                    )}
+                    {form.isRace && <View style={styles.radioInner} />}
                 </TouchableOpacity>
                 <Text style={{ fontFamily: FONT, fontSize: 16, color: '#222' }}>It's a race</Text>
             </View>
 
+            {/* Age Limit Radio Buttons */}
+            <View style={{ marginBottom: 14 }}>
+                <Text style={styles.sectionLabel}>Age limit</Text>
+                {['none', '18+', 'children'].map(option => (
+                    <TouchableOpacity
+                        key={option}
+                        onPress={() => setForm({ ...form, ageLimit: option })}
+                        style={styles.radioRow}
+                    >
+                        <View style={styles.radioOuter}>
+                            {form.ageLimit === option && <View style={styles.radioInnerBlue} />}
+                        </View>
+                        <Text style={styles.radioLabel}>
+                            {option === 'none' ? 'No limit' : option === '18+' ? '18+' : 'For children only'}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+                {form.ageLimit === 'children' && (
+                    <TextInput
+                        style={[styles.input, { width: 120 }]}
+                        placeholder="Max age"
+                        keyboardType="numeric"
+                        value={form.maxChildAge}
+                        onChangeText={text => setForm({ ...form, maxChildAge: text })}
+                    />
+                )}
+            </View>
+
+            {/* Other Dynamic Fields */}
+            <View style={{ marginBottom: 14 }}>
+                <TouchableOpacity
+                    onPress={() => setForm({ ...form, medicalRequired: !form.medicalRequired })}
+                    style={styles.radioRow}
+                >
+                    <View style={styles.radioOuter}>
+                        {form.medicalRequired && <View style={styles.radioInnerBlue} />}
+                    </View>
+                    <Text style={styles.radioLabel}>Requires medical certificate</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => setForm({ ...form, teamEvent: !form.teamEvent })}
+                    style={styles.radioRow}
+                >
+                    <View style={styles.radioOuter}>
+                        {form.teamEvent && <View style={styles.radioInnerBlue} />}
+                    </View>
+                    <Text style={styles.radioLabel}>Team event</Text>
+                </TouchableOpacity>
+            </View>
+
+            {/* Gender Restriction Radio Buttons */}
+            <View style={{ marginBottom: 14 }}>
+                <Text style={styles.sectionLabel}>Gender restriction</Text>
+                {['any', 'male', 'female'].map(option => (
+                    <TouchableOpacity
+                        key={option}
+                        onPress={() => setForm({ ...form, genderRestriction: option })}
+                        style={styles.radioRow}
+                    >
+                        <View style={styles.radioOuter}>
+                            {form.genderRestriction === option && <View style={styles.radioInnerBlue} />}
+                        </View>
+                        <Text style={styles.radioLabel}>
+                            {option === 'any' ? 'Any' : option.charAt(0).toUpperCase() + option.slice(1)}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+
+            {/* Description Input */}
+                <TextInput
+                    style={[styles.input, { height: 90, textAlignVertical: 'top' }]}
+                    value={form.description}
+                    onChangeText={text => setForm({ ...form, description: text })}
+                    placeholder="Event description"
+                    placeholderTextColor="#aaa"
+                    multiline
+                    numberOfLines={4}
+                />
+
+            {/* Buttons */}
             <View style={styles.buttonRow}>
                 <TouchableOpacity
                     style={secondaryButton}
@@ -246,6 +311,7 @@ export default function NewEventForm({ navigation }) {
                     <Text style={primaryButtonText}>Accept</Text>
                 </TouchableOpacity>
             </View>
+            </ScrollView>
         </View>
     );
 }
@@ -293,7 +359,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 200,
+        marginTop: 40,
         position: 'relative',
         bottom: 36,
         left: 0,
@@ -314,5 +380,43 @@ const styles = StyleSheet.create({
         borderRadius: 0,
         paddingLeft: 15,
         paddingRight: 15,
-    }
+    },
+    radioOuter: {
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        borderWidth: 2,
+        borderColor: '#1c1c1c',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 8,
+    },
+    radioInner: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: '#1c1c1c',
+    },
+    radioInnerBlue: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: '#1c1c1c',
+    },
+    radioRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    radioLabel: {
+        fontFamily: FONT,
+        fontSize: 15,
+        color: '#222',
+    },
+    sectionLabel: {
+        fontFamily: FONT,
+        fontSize: 16,
+        color: '#222',
+        marginBottom: 6,
+    },
 });
