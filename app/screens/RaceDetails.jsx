@@ -9,6 +9,9 @@ import {
     secondaryButton,
     secondaryButtonText,
 } from '../components/constants';
+import * as Print from 'expo-print';
+import { shareAsync } from 'expo-sharing';
+
 
 export default function RaceDetails({ navigation }) {
     const [running, setRunning] = useState(false);
@@ -22,6 +25,24 @@ export default function RaceDetails({ navigation }) {
         const hours = Math.floor(t / 3600000);
         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     };
+
+    const handlePrint = async () => {
+        let htmlContent = `
+        <h1>Race Results</h1>
+        <table border="1" cellspacing="0" cellpadding="5">
+            <tr><th>ID</th><th>Time</th></tr>
+            ${entries.map(e => `<tr><td>${e.id}</td><td>${e.time}</td></tr>`).join('')}
+        </table>
+    `;
+
+        try {
+            const { uri } = await Print.printToFileAsync({ html: htmlContent });
+            await shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
+        } catch (err) {
+            Alert.alert('Error', err.message);
+        }
+    };
+
 
     const toggleTimer = () => {
         if (running) {
@@ -67,7 +88,7 @@ export default function RaceDetails({ navigation }) {
                 <TouchableOpacity style={optionsButton} onPress={() => {}}>
                     <Text style={optionsButtonText}>Options</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={optionsButton} onPress={() => {}}>
+                <TouchableOpacity style={optionsButton} onPress={handlePrint}>
                     <Text style={optionsButtonText}>Print</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={optionsButton} onPress={() => {}}>
