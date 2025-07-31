@@ -23,6 +23,13 @@ export default function RaceDetails({ navigation }) {
     const [sortBy, setSortBy] = useState(null);
     const [sortOrder, setSortOrder] = useState('asc');
 
+    const handleStartNewRace = () => {
+        setEntries([]);
+        setTime(0);
+        setRunning(false);
+        setEditIndex(null);
+    };
+
     const sortEntries = (column) => {
         let order = sortOrder;
         if (sortBy === column) {
@@ -190,11 +197,14 @@ export default function RaceDetails({ navigation }) {
             </TouchableOpacity>
 
             <View style={styles.controls}>
-                <TouchableOpacity style={optionsButton} onPress={() => {}}>
-                    <Text style={optionsButtonText}>Options</Text>
-                </TouchableOpacity>
                 <TouchableOpacity style={optionsButton} onPress={handlePrint}>
                     <Text style={optionsButtonText}>Print</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[optionsButton, { minWidth: 130, paddingHorizontal: 22 }]}
+                    onPress={handleStartNewRace}
+                >
+                    <Text style={optionsButtonText}>Start new race</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={optionsButton} onPress={() => {}}>
                     <Text style={optionsButtonText}>Save</Text>
