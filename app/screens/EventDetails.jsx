@@ -68,11 +68,10 @@ export default function EventDetails({ route, navigation }) {
             <View style={styles.topRow}>
                 <View style={styles.logoBox}>
                     {event.logo ? (
-                        <Image source={{ uri: event.logo }} style={styles.logoImage} resizeMode="contain" />
+                        <Image source={{uri: event.logo}} style={styles.logoImage} resizeMode="contain"/>
                     ) : (
                         <Text style={styles.logoText}>LOGO</Text>
                     )}
-
                 </View>
 
                 <View style={styles.detailsBox}>
@@ -87,13 +86,19 @@ export default function EventDetails({ route, navigation }) {
                 </View>
             </View>
 
-            {/*<View style={styles.mapBox}>*/}
-            {/*    <Text style={styles.mapText}>MAP / ROUTE PREVIEW</Text>*/}
-            {/*</View>*/}
-
+            {/* Race button, only if it's a race */}
+            {event.isRace && (
+                <TouchableOpacity
+                    style={[primaryButton, {marginTop: 24, marginBottom: 12}]}
+                    onPress={() => navigation.navigate('RaceControls')}
+                >
+                    <Text style={primaryButtonText}>Race Details</Text>
+                </TouchableOpacity>
+            )}
             <TouchableOpacity
-                style={[primaryButton, { marginBottom: 80 }]}
-                onPress={() => {}}
+                style={[primaryButton, {marginBottom: 80}]}
+                onPress={() => {
+                }}
             >
                 <Text style={primaryButtonText}>Manage registrations</Text>
             </TouchableOpacity>

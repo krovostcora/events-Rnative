@@ -25,6 +25,7 @@ async function sendEventToServer(form) {
             name: form.name,
             time: form.time,
             place: form.place,
+            isRace: false
         }),
     });
 
@@ -203,6 +204,33 @@ export default function NewEventForm({ navigation }) {
             {warning ? (
                 <Text style={{ color: 'red', marginBottom: 8, fontFamily: FONT }}>{warning}</Text>
             ) : null}
+
+            {/*car race*/}
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 14 }}>
+                <TouchableOpacity
+                    onPress={() => setForm({ ...form, isRace: !form.isRace })}
+                    style={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: 12,
+                        borderWidth: 2,
+                        borderColor: '#000000',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginRight: 8,
+                    }}
+                >
+                    {form.isRace && (
+                        <View style={{
+                            width: 12,
+                            height: 12,
+                            borderRadius: 6,
+                            backgroundColor: '#1c1c1c',
+                        }} />
+                    )}
+                </TouchableOpacity>
+                <Text style={{ fontFamily: FONT, fontSize: 16, color: '#222' }}>It's a race</Text>
+            </View>
 
             <View style={styles.buttonRow}>
                 <TouchableOpacity

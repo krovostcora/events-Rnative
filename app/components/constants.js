@@ -2,7 +2,6 @@
 export const BUTTON_STYLE = {
     borderRadius: 0,
     borderColor: '#bbb',
-    // fontFamily: FONT,
     fontWeight: 'bold',
     fontSize: 16,
     letterSpacing: 1,
@@ -57,4 +56,22 @@ export const toggleButtonActive = {
 export const toggleButtonText = {
     color: '#fff',
     ...BUTTON_STYLE,
+};
+
+// OPTIONS (grey)
+export const optionsButton = {
+    backgroundColor: '#8f8f8f',
+    borderColor: '#666',
+    borderWidth: 1,
+    paddingVertical: 16,
+    paddingHorizontal: 2,
+    minWidth: 90,
+    alignItems: 'center',
+    letterSpacing: 1,
+};
+
+export const optionsButtonText = {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
 };

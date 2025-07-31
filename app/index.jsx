@@ -8,6 +8,7 @@ import EventDetails from './screens/EventDetails';
 import ParticipantCard from './screens/ParticipantCard';
 import DateSearch from "./screens/DateSearch";
 import MapScreen from "./components/MapScreen";
+import RaceDetails from "./screens/RaceDetails";
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +22,7 @@ export default function App() {
                 <Stack.Screen name="ParticipantCard" component={ParticipantCard} />
                 <Stack.Screen name="DateSearch" component={DateSearch} />
                 <Stack.Screen name="MapScreen" component={MapScreen} />
+                <Stack.Screen name="RaceControls" component={RaceDetails} />
             </Stack.Navigator>
     );
 }
