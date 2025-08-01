@@ -76,12 +76,11 @@ export default function EventDetails({ route, navigation }) {
             <View style={styles.topRow}>
                 <View style={styles.logoBox}>
                     {event.logo ? (
-                        <Image source={{uri: event.logo}} style={styles.logoImage} resizeMode="contain"/>
+                        <Image source={{ uri: event.logo }} style={styles.logoImage} resizeMode="contain" />
                     ) : (
                         <Text style={styles.logoText}>LOGO</Text>
                     )}
                 </View>
-
                 <View style={styles.detailsBox}>
                     <Text style={styles.detailText}>Date: {event.date}</Text>
                     <Text style={styles.detailText}>Time: {event.time}</Text>
@@ -96,44 +95,53 @@ export default function EventDetails({ route, navigation }) {
 
             {event.isRace && (
                 <TouchableOpacity
-                    style={[primaryButton, {marginTop: 24, marginBottom: 12}]}
+                    style={[primaryButton, { marginTop: 24, marginBottom: 12 }]}
                     onPress={() => navigation.navigate('RaceControls')}
                 >
                     <Text style={primaryButtonText}>Race Details</Text>
                 </TouchableOpacity>
             )}
+
             <TouchableOpacity
-                style={[primaryButton, {marginBottom: 80}]}
-                onPress={() => {}}
+                style={[primaryButton, { marginBottom: 80 }]}
+                onPress={() => navigation.navigate('ManageRegistrations', { folder: getFolderName(event) })}
             >
                 <Text style={primaryButtonText}>Manage registrations</Text>
             </TouchableOpacity>
 
-            <View style={styles.moreDetailsBox}>
-                <Text style={styles.sectionLabel}>Event details:</Text>
-                {event.ageLimit && event.ageLimit !== 'none' && event.ageLimit !== '0' && (
-                    <Text style={styles.moreDetailText}>
-                        Age limit: {event.ageLimit === '18+' ? '18+' :
-                        event.ageLimit === 'children' ? `For children only${event.maxChildAge && event.maxChildAge !== '0' ? ` (max age: ${event.maxChildAge})` : ''}` :
-                            event.ageLimit}
-                    </Text>
-                )}
-                {event.medicalRequired && event.medicalRequired !== 'no' && event.medicalRequired !== '0' && (
-                    <Text style={styles.moreDetailText}>
-                        Medical certificate: Required
-                    </Text>
-                )}
-                {event.teamEvent && event.teamEvent !== 'no' && event.teamEvent !== '0' && (
-                    <Text style={styles.moreDetailText}>
-                        Team event: Yes
-                    </Text>
-                )}
-                {event.genderRestriction && event.genderRestriction !== 'any' && event.genderRestriction !== 'no' && (
-                    <Text style={styles.moreDetailText}>
-                        Gender restriction: {event.genderRestriction.charAt(0).toUpperCase() + event.genderRestriction.slice(1)}
-                    </Text>
-                )}
-            </View>
+            {(
+                (event.ageLimit && event.ageLimit !== 'none' && event.ageLimit !== '0') ||
+                (event.medicalRequired && event.medicalRequired !== 'no' && event.medicalRequired !== '0') ||
+                (event.teamEvent && event.teamEvent !== 'no' && event.teamEvent !== '0') ||
+                (event.genderRestriction && event.genderRestriction !== 'any' && event.genderRestriction !== 'no')
+            ) && (
+                <View style={styles.moreDetailsBox}>
+                    <Text style={styles.sectionLabel}>Event details:</Text>
+                    {event.ageLimit && event.ageLimit !== 'none' && event.ageLimit !== '0' && (
+                        <Text style={styles.moreDetailText}>
+                            Age limit: {event.ageLimit === '18+' ? '18+' :
+                            event.ageLimit === 'children'
+                                ? `For children only${event.maxChildAge && event.maxChildAge !== '0' ? ` (max age: ${event.maxChildAge})` : ''}`
+                                : event.ageLimit}
+                        </Text>
+                    )}
+                    {event.medicalRequired && event.medicalRequired !== 'no' && event.medicalRequired !== '0' && (
+                        <Text style={styles.moreDetailText}>
+                            Medical certificate: Required
+                        </Text>
+                    )}
+                    {event.teamEvent && event.teamEvent !== 'no' && event.teamEvent !== '0' && (
+                        <Text style={styles.moreDetailText}>
+                            Team event: Yes
+                        </Text>
+                    )}
+                    {event.genderRestriction && event.genderRestriction !== 'any' && event.genderRestriction !== 'no' && (
+                        <Text style={styles.moreDetailText}>
+                            Gender restriction: {event.genderRestriction.charAt(0).toUpperCase() + event.genderRestriction.slice(1)}
+                        </Text>
+                    )}
+                </View>
+            )}
 
             {event.description && event.description.trim() !== '' && (
                 <View style={styles.descriptionBox}>
@@ -153,7 +161,6 @@ export default function EventDetails({ route, navigation }) {
                     style={primaryButton}
                     onPress={() => {
                         if (!event) return;
-
                         navigation.navigate('Registration', {
                             event: {
                                 ...event,

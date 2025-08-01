@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import {View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
+import {primaryButton, primaryButtonText, secondaryButton, secondaryButtonText} from "../components/constants";
 
-export default function ManageRegistrations({ route }) {
+export default function ManageRegistrations({ route, navigation }) {
     const folder = route.params?.folder;
     const [participants, setParticipants] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -54,12 +55,24 @@ export default function ManageRegistrations({ route }) {
     );
 
     return (
-        <FlatList
-            data={participants}
-            keyExtractor={(_, idx) => idx.toString()}
-            renderItem={renderItem}
-            contentContainerStyle={styles.list}
-        />
+        <View style={{flex: 1}}>
+            <ScrollView contentContainerStyle={styles.list}>
+                {participants.map((item, idx) => (
+                    <View style={styles.row} key={idx}>
+                        <Text style={styles.name}>{item.name} {item.surname}</Text>
+                        <Text style={styles.details}>Age: {item.age} | Gender: {item.gender} | Email: {item.email}</Text>
+                    </View>
+                ))}
+            </ScrollView>
+            <View style={styles.buttonRow}>
+                <TouchableOpacity
+                    style={secondaryButton}
+                    onPress={() => navigation.navigate('EventSelector')}
+                >
+                    <Text style={secondaryButtonText}>Back</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
     );
 }
 
@@ -80,7 +93,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         padding: 12,
         marginBottom: 10,
-        borderRadius: 6,
+        borderWidth: 1,
         elevation: 1,
     },
     name: {
