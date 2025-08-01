@@ -5,10 +5,11 @@ import HomeScreen from './screens/HomeScreen';
 import EventSelector from './screens/EventSelector';
 import NewEventForm from './screens/NewEventForm';
 import EventDetails from './screens/EventDetails';
-import ParticipantCard from './screens/ParticipantCard';
+import Registration from './screens/Registration';
 import DateSearch from "./screens/DateSearch";
 import MapScreen from "./components/MapScreen";
 import RaceDetails from "./screens/RaceDetails";
+import ManageRegistrations from "./screens/ManageRegistrations";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,10 +20,11 @@ export default function App() {
                 <Stack.Screen name="EventSelector" component={EventSelector} />
                 <Stack.Screen name="NewEventForm" component={NewEventForm} />
                 <Stack.Screen name="EventDetails" component={EventDetails} />
-                <Stack.Screen name="ParticipantCard" component={ParticipantCard} />
+                <Stack.Screen name="Registration" component={Registration} />
                 <Stack.Screen name="DateSearch" component={DateSearch} />
                 <Stack.Screen name="MapScreen" component={MapScreen} />
                 <Stack.Screen name="RaceControls" component={RaceDetails} />
+                <Stack.Screen name="ManageRegistrations" component={ManageRegistrations} />
             </Stack.Navigator>
     );
 }

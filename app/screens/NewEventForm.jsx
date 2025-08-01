@@ -14,12 +14,27 @@ const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 async function sendEventToServer(form) {
     const generateId = () => Math.random().toString(36).substring(2, 10) + Date.now();
     const id = generateId();
-    const csvLine = `${id};${form.name};${form.date};${form.time};${form.place}\n`;
+    const csvLine = [
+        id,
+        form.name,
+        form.date,
+        form.time,
+        typeof form.place === 'string' ? form.place : JSON.stringify(form.place),
+        form.isRace,
+        form.ageLimit,
+        form.maxChildAge,
+        form.medicalRequired,
+        form.teamEvent,
+        form.genderRestriction,
+        form.description
+    ].join(';') + '\n';
+
 
     const response = await fetch('https://events-server-eu5z.onrender.com/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+            id,
             csvLine,
             date: form.date,
             name: form.name,

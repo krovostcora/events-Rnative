@@ -15,6 +15,14 @@ export default function EventDetails({ route, navigation }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const getFolderName = (event) => {
+        if (!event) return '';
+        // Якщо event вже містить folder (для нових подій)
+        if (event.folder) return event.folder;
+        // Для старих подій генеруємо з дати та назви
+        return `${event.date.replace(/-/g, '')}_${event.name.toLowerCase().replace(/\s+/g, '')}`;
+    };
+
     useEffect(() => {
         if (!eventId) {
             setError('No event selected');
@@ -143,9 +151,24 @@ export default function EventDetails({ route, navigation }) {
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={primaryButton}
-                    onPress={() => navigation.navigate('ParticipantCard')}
+                    onPress={() => {
+                        if (!event) return;
+
+                        navigation.navigate('Registration', {
+                            event: {
+                                ...event,
+                                folder: getFolderName(event),
+                            },
+                            eventRestrictions: {
+                                ageLimit: event.ageLimit,
+                                maxChildAge: event.maxChildAge,
+                                genderRestriction: event.genderRestriction,
+                                isRace: event.isRace === true || event.isRace === 'true',
+                            },
+                        });
+                    }}
                 >
-                    <Text style={primaryButtonText}>Registrate</Text>
+                    <Text style={primaryButtonText}>Register</Text>
                 </TouchableOpacity>
             </View>
         </View>
