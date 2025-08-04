@@ -11,7 +11,7 @@ import { validateParticipant } from '../../utils/validateParticipant';
 
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
-const roles = ['spectator', 'participant', 'runner'];
+const roles = ['spectator', 'runner']; // spectator = глядач, runner = учасник
 
 export default function ManageRegistrations({ route, navigation }) {
     const folder = route.params?.folder;
@@ -21,13 +21,46 @@ export default function ManageRegistrations({ route, navigation }) {
     const [editIndex, setEditIndex] = useState(null);
     const [editParticipant, setEditParticipant] = useState({});
     const [validationErrors, setValidationErrors] = useState({});
+    const [eventRestrictions, setEventRestrictions] = useState(null);
 
-    const eventRestrictions = {
-        ...route.params?.eventRestrictions,
-        isRace:
-            route.params?.eventRestrictions?.isRace === true ||
-            route.params?.eventRestrictions?.isRace === 'true'
-    };
+
+    // const eventRestrictions = {
+    //     ...route.params?.eventRestrictions,
+    //     isRace:
+    //         route.params?.eventRestrictions?.isRace === true ||
+    //         route.params?.eventRestrictions?.isRace === 'true'
+    // };
+
+    useEffect(() => {
+        if (!folder) return;
+        fetch(`https://events-server-eu5z.onrender.com/api/events/${folder}`)
+            .then(res => res.json())
+            .then(event => {
+                setEventRestrictions({
+                    isRace: event.isRace,
+                    ageLimit: event.ageLimit,
+                    maxChildAge: event.maxChildAge,
+                    genderRestriction: event.genderRestriction,
+                });
+            })
+            .catch(() => setError('Failed to load event restrictions'));
+    }, [folder]);
+
+    // Fetch participants
+    useEffect(() => {
+        if (!folder) return;
+        setLoading(true);
+        fetch(`https://events-server-eu5z.onrender.com/api/events/${folder}/participants`)
+            .then(res => res.json())
+            .then(data => {
+                setParticipants(data);
+                setLoading(false);
+            })
+            .catch(() => {
+                setError('Failed to load participants');
+                setLoading(false);
+            });
+    }, [folder]);
 
     useEffect(() => {
         if (!folder) return;
@@ -200,7 +233,7 @@ export default function ManageRegistrations({ route, navigation }) {
                                 <Text style={styles.details}>Age: {item.age} | Gender: {item.gender} | Email: {item.email}</Text>
                                 <Text style={styles.details}>
                                     Phone: {item.phone}
-                                    {eventRestrictions.isRace && item.raceRole ? ` | Role: ${item.raceRole}` : ''}
+                                    {eventRestrictions && eventRestrictions.isRace && item.raceRole ? ` | Role: ${item.raceRole}` : ''}
                                 </Text>
                                 <View style={styles.actions}>
                                     <TouchableOpacity

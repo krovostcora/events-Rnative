@@ -1,4 +1,5 @@
 const MAX_AGE = 150;
+const ALLOWED_GENDERS = ['male', 'female', 'other'];
 
 const capitalize = (str) =>
     typeof str === 'string' && str.length > 0
@@ -38,6 +39,11 @@ function validateGeneral(form) {
     }
     if (!isNonEmptyString(form.surname)) {
         errors.surname = 'Surname is required';
+        isValid = false;
+    }
+
+    if (!isNonEmptyString(form.gender) || !ALLOWED_GENDERS.includes(form.gender.toLowerCase())) {
+        errors.gender = `Gender must be one of: ${ALLOWED_GENDERS.join(', ')}`;
         isValid = false;
     }
 
