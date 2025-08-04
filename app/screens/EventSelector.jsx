@@ -5,7 +5,7 @@ import {
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-} from '../components/constants';
+} from '../../components/constants';
 
 export default function EventSelector({ navigation }) {
     const [dropdownOpen, setDropdownOpen] = useState(false);

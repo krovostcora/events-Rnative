@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform, Linking, Image } from 'react-native';
+import {View, ScrollView, Text, TouchableOpacity, StyleSheet, Platform, Linking, Image} from 'react-native';
 import {
     primaryButton,
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-} from '../components/constants';
+} from '../../components/constants';
 
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
@@ -71,6 +71,7 @@ export default function EventDetails({ route, navigation }) {
 
     return (
         <View style={styles.container}>
+            <ScrollView contentContainerStyle={{ alignItems: 'center', paddingBottom: 24 }} style={{ width: '100%' }}>
             <Text style={styles.title}>{event.name}</Text>
 
             <View style={styles.topRow}>
@@ -149,6 +150,8 @@ export default function EventDetails({ route, navigation }) {
                     <Text style={styles.descriptionText}>{event.description}</Text>
                 </View>
             )}
+
+            </ScrollView>
 
             <View style={[styles.buttonRow, { marginTop: 60 }]}>
                 <TouchableOpacity

@@ -14,7 +14,9 @@ import {
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-} from '../components/constants';
+} from '../../components/constants';
+import { validateParticipant } from '../../utils/validateParticipant';
+
 
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
@@ -76,7 +78,10 @@ function RaceRoleRadio({ value, onChange }) {
 }
 
 export default function Registration({ navigation, route }) {
-    const eventRestrictions = route.params?.eventRestrictions || {};
+    const eventRestrictions = {
+        ...route.params?.eventRestrictions,
+        isRace: route.params?.eventRestrictions?.isRace === true || route.params?.eventRestrictions?.isRace === 'true'
+    };
     const [form, setForm] = useState({
         name: '',
         surname: '',
@@ -99,91 +104,36 @@ export default function Registration({ navigation, route }) {
         }
     };
 
-    const validateForm = () => {
-        const errors = {};
-        let isValid = true;
-
-        if (!form.name.trim()) {
-            errors.name = 'Name is required';
-            isValid = false;
-        }
-
-        if (!form.surname.trim()) {
-            errors.surname = 'Surname is required';
-            isValid = false;
-        }
-
-        const ageNum = Number(form.age);
-        if (!form.age || isNaN(ageNum) || ageNum <= 0) {
-            errors.age = 'Age must be a positive number';
-            isValid = false;
-        } else if (ageNum > 150) {
-            errors.age = 'Age must not exceed 150';
-            isValid = false;
-        }
-
-        // Event specific validations
-        if (eventRestrictions.ageLimit === '18+' && ageNum < 18) {
-            errors.age = 'Sorry, this event is 18+ only';
-            isValid = false;
-        }
-
-        if (eventRestrictions.ageLimit === 'children' &&
-            eventRestrictions.maxChildAge &&
-            ageNum > Number(eventRestrictions.maxChildAge)) {
-            errors.age = `Sorry, only children up to ${eventRestrictions.maxChildAge} years can participate`;
-            isValid = false;
-        }
-
-        if (eventRestrictions.genderRestriction &&
-            eventRestrictions.genderRestriction !== 'any' &&
-            form.gender !== eventRestrictions.genderRestriction) {
-            errors.gender = `Sorry, this event is for ${eventRestrictions.genderRestriction} only`;
-            isValid = false;
-        }
-
-        if (eventRestrictions.isRace && !form.raceRole) {
-            errors.raceRole = 'Please select your race role';
-            isValid = false;
-        }
-
-        setValidationErrors(errors);
-        return isValid;
-    };
-
-    // Додаємо перевірку на race event при відправці форми
     const handleSubmit = async () => {
         if (isSubmitting) return;
 
-        if (!validateForm()) {
-            return;
-        }
+        const { isValid, errors, normalizedForm } = validateParticipant(form, eventRestrictions);
+        setValidationErrors(errors);
+
+        if (!isValid) return;
 
         setIsSubmitting(true);
 
         try {
-            // Отримуємо event з route.params
             const event = route.params?.event;
 
             if (!event) {
                 throw new Error('Event data is missing');
             }
 
-            // Генеруємо folderName з дати та назви події
             const folderName = `${event.date.replace(/-/g, '')}_${event.name.toLowerCase().replace(/\s+/g, '')}`;
 
             const payload = {
-                name: form.name.trim(),
-                surname: form.surname.trim(),
-                gender: form.gender,
-                age: form.age,
-                email: form.email.trim(),
-                phone: form.phone,
+                name: normalizedForm.name,
+                surname: normalizedForm.surname,
+                gender: normalizedForm.gender,
+                age: normalizedForm.age,
+                email: normalizedForm.email,
+                phone: normalizedForm.phone,
             };
 
-            // Додаємо raceRole тільки для racing подій
             if (event.isRace) {
-                payload.raceRole = form.raceRole || 'spectator';
+                payload.raceRole = normalizedForm.raceRole || 'spectator';
             }
 
             console.log('Submitting to folder:', folderName);

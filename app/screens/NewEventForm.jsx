@@ -7,7 +7,7 @@ import {
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-} from '../components/constants';
+} from '../../components/constants';
 
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 

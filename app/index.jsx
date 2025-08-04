@@ -7,7 +7,7 @@ import NewEventForm from './screens/NewEventForm';
 import EventDetails from './screens/EventDetails';
 import Registration from './screens/Registration';
 import DateSearch from "./screens/DateSearch";
-import MapScreen from "./components/MapScreen";
+import MapScreen from "./screens/MapScreen";
 import RaceDetails from "./screens/RaceDetails";
 import ManageRegistrations from "./screens/ManageRegistrations";
 

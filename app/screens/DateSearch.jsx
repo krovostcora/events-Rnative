@@ -17,7 +17,7 @@ import {
     toggleButton,
     toggleButtonActive,
     toggleButtonText,
-} from '../components/constants';
+} from '../../components/constants';
 
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 

@@ -8,7 +8,7 @@ import {
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-} from '../components/constants';
+} from '../../components/constants';
 import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
 
@@ -126,11 +126,17 @@ export default function RaceDetails({ navigation }) {
                         onChangeText={(time) => setEditEntry({ ...editEntry, time })}
                     />
                     <View style={[styles.cellOptions, { flex: 2 }]}>
-                        <TouchableOpacity onPress={handleSaveEdit}>
-                            <Text style={styles.editButton}>Save</Text>
+                        <TouchableOpacity
+                            style={styles.saveButton}
+                            onPress={handleSaveEdit}
+                        >
+                            <Text style={styles.saveButtonText}>Save</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setEditIndex(null)}>
-                            <Text style={styles.cancelButton}>Cancel</Text>
+                        <TouchableOpacity
+                            style={styles.cancelButton}
+                            onPress={() => setEditIndex(null)}
+                        >
+                            <Text style={styles.cancelButtonText}>Cancel</Text>
                         </TouchableOpacity>
                     </View>
                 </>
@@ -139,11 +145,15 @@ export default function RaceDetails({ navigation }) {
                     <Text style={[styles.cellId, { flex: 0.6 }]}>{item.id}</Text>
                     <Text style={[styles.cellTime, { flex: 1.1 }]}>{item.time}</Text>
                     <View style={[styles.cellOptions, { flex: 2 }]}>
-                        <TouchableOpacity onPress={() => handleEdit(index)}>
-                            <Text style={styles.editButton}>Edit</Text>
+                        <TouchableOpacity
+                            style={styles.editButton}
+                            onPress={() => handleEdit(index)}>
+                            <Text style={styles.editButtonText}>Edit</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleDelete(index)}>
-                            <Text style={styles.deleteButton}>Delete</Text>
+                        <TouchableOpacity
+                            style={styles.deleteButton}
+                            onPress={() => handleDelete(index)}>
+                            <Text style={styles.deleteButtonText}>Delete</Text>
                         </TouchableOpacity>
                     </View>
                 </>
@@ -284,16 +294,92 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     editButton: {
-        color: '#007AFF',
-        fontSize: 15,
+        backgroundColor: '#e0e0e0',
+        borderColor: '#b0b0b0',
+        borderWidth: 1,
+        borderRadius: 3,
+        paddingVertical: 5,
+        paddingHorizontal: 16,
+        marginLeft: 8,
+        shadowColor: '#fff',
+        shadowOffset: { width: -1, height: -1 },
+        shadowOpacity: 1,
+        shadowRadius: 0,
+        elevation: 2,
     },
     deleteButton: {
-        color: '#D00',
+        backgroundColor: '#e0e0e0',
+        borderColor: '#b0b0b0',
+        borderWidth: 1,
+        borderRadius: 3,
+        paddingVertical: 5,
+        paddingHorizontal: 16,
+        marginLeft: 8,
+        shadowColor: '#fff',
+        shadowOffset: { width: -1, height: -1 },
+        shadowOpacity: 1,
+        shadowRadius: 0,
+        elevation: 2,
+    },
+    editButtonText: {
+        color: '#0033cc',
+        fontWeight: 'bold',
         fontSize: 15,
+        textShadowColor: '#fff',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 0,
     },
     cancelButton: {
-        color: '#999',
+        backgroundColor: '#e0e0e0',
+        borderColor: '#888',
+        borderWidth: 1,
+        borderRadius: 3,
+        paddingVertical: 5,
+        paddingHorizontal: 16,
+        marginLeft: 8,
+        shadowColor: '#fff',
+        shadowOffset: { width: -1, height: -1 },
+        shadowOpacity: 1,
+        shadowRadius: 0,
+        elevation: 2,
+    },
+    cancelButtonText: {
+        color: '#666',
+        fontWeight: 'bold',
         fontSize: 15,
+        textShadowColor: '#fff',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 0,
+    },
+    deleteButtonText: {
+        color: '#cc0000',
+        fontWeight: 'bold',
+        fontSize: 15,
+        textShadowColor: '#fff',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 0,
+    },
+    saveButton: {
+        backgroundColor: '#e0e0e0',
+        borderColor: '#888',
+        borderWidth: 1,
+        borderRadius: 3,
+        paddingVertical: 5,
+        paddingHorizontal: 16,
+        marginLeft: 8,
+        shadowColor: '#fff',
+        shadowOffset: { width: -1, height: -1 },
+        shadowOpacity: 1,
+        shadowRadius: 0,
+        elevation: 2,
+    },
+    saveButtonText: {
+        color: '#009900',
+        fontWeight: 'bold',
+        fontSize: 15,
+        textShadowColor: '#fff',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 0,
     },
     controls: {
         marginVertical: 16,
