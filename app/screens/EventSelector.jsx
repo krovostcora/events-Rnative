@@ -5,7 +5,8 @@ import {
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-} from '../../components/constants';
+} from '../../components/buttons_styles';
+import { UNIFIED_STYLES } from '../../components/constants';
 
 export default function EventSelector({ navigation }) {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -28,7 +29,6 @@ export default function EventSelector({ navigation }) {
             });
     }, []);
 
-
     const handleAccept = () => {
         if (selectedEvent) {
             navigation.navigate('EventDetails', { event: selectedEvent.folder });
@@ -41,8 +41,8 @@ export default function EventSelector({ navigation }) {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.label}>Select event</Text>
+        <View style={UNIFIED_STYLES.container}>
+            <Text style={UNIFIED_STYLES.title}>Select event</Text>
 
             <View ref={dropdownRef} onLayout={onDropdownLayout}>
                 <TouchableOpacity
@@ -101,7 +101,7 @@ export default function EventSelector({ navigation }) {
 
             {loading && <Text style={styles.status}>Loading events...</Text>}
 
-            <View style={styles.buttonRow}>
+            <View style={[UNIFIED_STYLES.buttonRow, { marginTop: 300 }]}>
                 <TouchableOpacity
                     style={secondaryButton}
                     onPress={() => navigation.navigate('Home')}
@@ -129,62 +129,57 @@ export default function EventSelector({ navigation }) {
     );
 }
 
-const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
+const FONT = Platform.OS === 'ios' ? 'System' : 'monospace';
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f4f4f4',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        paddingTop: 150,
-    },
-    label: {
-        fontFamily: FONT,
-        fontSize: 18,
-        color: '#222',
-        marginBottom: 10,
-        letterSpacing: 1,
-        alignSelf: 'center',
-    },
     dropdown: {
         width: 280,
-        height: 48,
+        height: 40,
         borderWidth: 2,
-        borderColor: '#bbb',
+        borderColor: '#b0b0b0',
         backgroundColor: '#fff',
         justifyContent: 'center',
         paddingHorizontal: 16,
         marginBottom: 2,
         borderRadius: 0,
+        shadowColor: '#fff',
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 1,
+        shadowRadius: 0,
     },
     dropdownText: {
         fontFamily: FONT,
-        fontSize: 16,
+        fontSize: 15,
         color: '#222',
         letterSpacing: 1,
     },
     dropdownList: {
         width: 280,
         borderWidth: 2,
-        borderColor: '#bbb',
-        backgroundColor: '#fff',
+        borderColor: '#b0b0b0',
+        backgroundColor: '#f0f0f0',
         maxHeight: 180,
         borderRadius: 0,
+        shadowColor: '#fff',
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 1,
+        shadowRadius: 0,
     },
     item: {
-        paddingVertical: 12,
+        paddingVertical: 10,
         paddingHorizontal: 16,
         borderBottomWidth: 1,
-        borderColor: '#ddd',
+        borderColor: '#d4d0c8',
         backgroundColor: '#fff',
     },
     selectedItem: {
-        backgroundColor: '#e0e0e0',
+        backgroundColor: '#c0d8ff',
+        borderColor: '#003399',
+        borderWidth: 1,
     },
     itemText: {
         fontFamily: FONT,
-        fontSize: 16,
+        fontSize: 15,
         color: '#222',
     },
     status: {
@@ -193,16 +188,10 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         color: '#555',
         fontSize: 14,
-    },
-    buttonRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'absolute',
-        bottom: 36,
-        left: 0,
-        gap: 16,
-        right: 0,
-        width: '100%',
+        backgroundColor: '#f0f0f0',
+        borderWidth: 2,
+        borderColor: '#b0b0b0',
+        padding: 6,
+        alignSelf: 'center',
     },
 });

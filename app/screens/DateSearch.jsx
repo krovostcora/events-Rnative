@@ -17,23 +17,23 @@ import {
     toggleButton,
     toggleButtonActive,
     toggleButtonText,
-} from '../../components/constants';
+} from '../../components/buttons_styles';
+import { UNIFIED_STYLES } from '../../components/constants';
 
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
 export default function DateSearch({ navigation }) {
-    const [mode, setMode] = useState('single'); // search mode: single day or range
-    const [showStart, setShowStart] = useState(false); // show start date picker
-    const [showEnd, setShowEnd] = useState(false); // show end date picker (for range)
-    const [startDate, setStartDate] = useState(new Date()); // selected start date
-    const [endDate, setEndDate] = useState(new Date()); // selected end date
-    const [allEvents, setAllEvents] = useState([]); // all events from server
-    const [events, setEvents] = useState([]); // filtered events to display
+    const [mode, setMode] = useState('single');
+    const [showStart, setShowStart] = useState(false);
+    const [showEnd, setShowEnd] = useState(false);
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(new Date());
+    const [allEvents, setAllEvents] = useState([]);
+    const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [showDatePicker, setShowDatePicker] = useState({ mode: null, visible: false });
 
-    // Format date for display (DD.MM.YYYY)
     const formatDate = (d) => {
         if (!(d instanceof Date) || isNaN(d)) return 'Invalid Date';
         return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1)
@@ -41,17 +41,15 @@ export default function DateSearch({ navigation }) {
             .padStart(2, '0')}.${d.getFullYear()}`;
     };
 
-    // Parse ISO date string ('YYYY-MM-DD' or 'YYYY-MM-DDTHH:mm:ss...')
     const parseISODate = (dateStr) => {
         if (!dateStr) return new Date(NaN);
-        const datePart = dateStr.split('T')[0]; // ignore time if present
+        const datePart = dateStr.split('T')[0];
         const parts = datePart.split('-');
         if (parts.length !== 3) return new Date(NaN);
         const [year, month, day] = parts.map(Number);
         return new Date(year, month - 1, day);
     };
 
-    // Fetch events from server
     const fetchEvents = async () => {
         setLoading(true);
         setError(null);
@@ -59,13 +57,10 @@ export default function DateSearch({ navigation }) {
             const response = await fetch('https://events-server-eu5z.onrender.com/api/events');
             if (!response.ok) throw new Error('Failed to fetch events');
             const data = await response.json();
-
-            // Add parsedDate for easier filtering
             const processed = data.map(event => ({
                 ...event,
                 parsedDate: parseISODate(event.date),
             }));
-
             setAllEvents(processed);
         } catch (e) {
             setError(e.message);
@@ -74,27 +69,22 @@ export default function DateSearch({ navigation }) {
         }
     };
 
-    // Local filtering of events based on mode and dates
     const filterEvents = () => {
         if (!allEvents.length) {
             setEvents([]);
             return;
         }
-
         if (mode === 'single') {
-            // Filter events by exact date (ignore time)
             setEvents(
                 allEvents.filter(ev => {
                     return ev.parsedDate.toDateString() === startDate.toDateString();
                 })
             );
         } else {
-            // Date range: from startDate to endDate (inclusive)
             const start = new Date(startDate);
             start.setHours(0, 0, 0, 0);
             const end = new Date(endDate);
             end.setHours(23, 59, 59, 999);
-
             setEvents(
                 allEvents.filter(ev => {
                     const evDate = ev.parsedDate;
@@ -104,32 +94,27 @@ export default function DateSearch({ navigation }) {
         }
     };
 
-    // Fetch events when component mounts
     useEffect(() => {
         fetchEvents();
     }, []);
 
-    // Filter events when events or filter parameters change
     useEffect(() => {
         filterEvents();
     }, [allEvents, mode, startDate, endDate]);
 
-    // Optionally, for "Search" button
     const handleSearch = () => {
         filterEvents();
     };
 
-    // Clear events list and errors
     const handleCancel = () => {
         setEvents([]);
         setError(null);
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Search Events by Date</Text>
+        <View style={UNIFIED_STYLES.container}>
+            <Text style={UNIFIED_STYLES.title}>Search Events by Date</Text>
 
-            {/* Mode toggle */}
             <View style={styles.toggleRow}>
                 <TouchableOpacity
                     style={[toggleButton, mode === 'single' && toggleButtonActive]}
@@ -145,7 +130,6 @@ export default function DateSearch({ navigation }) {
                 </TouchableOpacity>
             </View>
 
-            {/* Start date picker */}
             {Platform.OS === 'web' ? (
                 <input
                     type="date"
@@ -162,7 +146,7 @@ export default function DateSearch({ navigation }) {
                                 visible: prev.visible && prev.mode === 'start' ? false : true
                             }))
                         }
-                        style={styles.input}
+                        style={UNIFIED_STYLES.input}
                     >
                         <Text style={styles.inputText}>
                             {mode === 'single' ? 'Select day' : 'Start date'}: {formatDate(startDate)}
@@ -182,7 +166,6 @@ export default function DateSearch({ navigation }) {
                 </>
             )}
 
-            {/* End date picker (range mode only) */}
             {mode === 'range' && (
                 Platform.OS === 'web' ? (
                     <input
@@ -200,7 +183,7 @@ export default function DateSearch({ navigation }) {
                                     visible: prev.visible && prev.mode === 'end' ? false : true
                                 }))
                             }
-                            style={styles.input}
+                            style={UNIFIED_STYLES.input}
                         >
                             <Text style={styles.inputText}>
                                 End date: {formatDate(endDate)}
@@ -221,7 +204,6 @@ export default function DateSearch({ navigation }) {
                 )
             )}
 
-            {/* Search button */}
             <TouchableOpacity
                 style={[primaryButton, {marginTop: 32, marginBottom: 16}]}
                 onPress={handleSearch}
@@ -229,7 +211,6 @@ export default function DateSearch({ navigation }) {
                 <Text style={primaryButtonText}>Search</Text>
             </TouchableOpacity>
 
-            {/* Events list */}
             <ScrollView style={styles.eventsList} contentContainerStyle={{paddingBottom: 80}}>
                 {loading && <ActivityIndicator size="large" color="#007AFF"/>}
                 {error && <Text style={styles.error}>{error}</Text>}
@@ -248,8 +229,7 @@ export default function DateSearch({ navigation }) {
                 ))}
             </ScrollView>
 
-            {/* Back button */}
-            <TouchableOpacity style={secondaryButton} onPress={() => navigation.goBack()}>
+            <TouchableOpacity style={[secondaryButton, { marginBottom: 20 }]} onPress={() => navigation.goBack()}>
                 <Text style={secondaryButtonText}>Back</Text>
             </TouchableOpacity>
         </View>
@@ -257,35 +237,10 @@ export default function DateSearch({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f4f4f4',
-        paddingTop: 80,
-        paddingHorizontal: 24,
-    },
-    title: {
-        fontFamily: FONT,
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#111',
-        letterSpacing: 1,
-        marginBottom: 24,
-        textAlign: 'center',
-    },
     toggleRow: {
         flexDirection: 'row',
         marginBottom: 24,
         justifyContent: 'center',
-    },
-    input: {
-        width: '100%',
-        height: 44,
-        borderWidth: 1,
-        borderColor: '#bbb',
-        backgroundColor: '#fff',
-        justifyContent: 'center',
-        paddingHorizontal: 12,
-        marginBottom: 16,
     },
     inputText: {
         color: '#222',

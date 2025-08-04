@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import {View, ScrollView, Text, TouchableOpacity, StyleSheet, Platform, Linking, Image} from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, StyleSheet, Platform, Linking, Image } from 'react-native';
 import {
     primaryButton,
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-} from '../../components/constants';
+} from '../../components/buttons_styles';
+import { UNIFIED_STYLES } from '../../components/constants';
 
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
@@ -17,9 +18,7 @@ export default function EventDetails({ route, navigation }) {
 
     const getFolderName = (event) => {
         if (!event) return '';
-        // Якщо event вже містить folder (для нових подій)
         if (event.folder) return event.folder;
-        // Для старих подій генеруємо з дати та назви
         return `${event.date.replace(/-/g, '')}_${event.name.toLowerCase().replace(/\s+/g, '')}`;
     };
 
@@ -55,7 +54,7 @@ export default function EventDetails({ route, navigation }) {
 
     if (loading) {
         return (
-            <View style={styles.container}>
+            <View style={UNIFIED_STYLES.container}>
                 <Text style={styles.loading}>Loading event details...</Text>
             </View>
         );
@@ -63,97 +62,95 @@ export default function EventDetails({ route, navigation }) {
 
     if (error || !event) {
         return (
-            <View style={styles.container}>
+            <View style={UNIFIED_STYLES.container}>
                 <Text style={styles.error}>{error || 'Event not found'}</Text>
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
+        <View style={UNIFIED_STYLES.container}>
             <ScrollView contentContainerStyle={{ alignItems: 'center', paddingBottom: 24 }} style={{ width: '100%' }}>
-            <Text style={styles.title}>{event.name}</Text>
+                <Text style={UNIFIED_STYLES.title}>{event.name}</Text>
 
-            <View style={styles.topRow}>
-                <View style={styles.logoBox}>
-                    {event.logo ? (
-                        <Image source={{ uri: event.logo }} style={styles.logoImage} resizeMode="contain" />
-                    ) : (
-                        <Text style={styles.logoText}>LOGO</Text>
-                    )}
+                <View style={styles.topRow}>
+                    <View style={styles.logoBox}>
+                        {event.logo ? (
+                            <Image source={{ uri: event.logo }} style={styles.logoImage} resizeMode="contain" />
+                        ) : (
+                            <Text style={styles.logoText}>LOGO</Text>
+                        )}
+                    </View>
+                    <View style={styles.detailsBox}>
+                        <Text style={styles.detailText}>Date: {event.date}</Text>
+                        <Text style={styles.detailText}>Time: {event.time}</Text>
+                        <TouchableOpacity onPress={handleLocationPress} activeOpacity={0.7}>
+                            <Text style={styles.linkText}>{event.place}</Text>
+                        </TouchableOpacity>
+                        {event.arrival && (
+                            <Text style={styles.detailText}>{event.arrival}</Text>
+                        )}
+                    </View>
                 </View>
-                <View style={styles.detailsBox}>
-                    <Text style={styles.detailText}>Date: {event.date}</Text>
-                    <Text style={styles.detailText}>Time: {event.time}</Text>
-                    <TouchableOpacity onPress={handleLocationPress} activeOpacity={0.7}>
-                        <Text style={styles.linkText}>{event.place}</Text>
+
+                {event.isRace && (
+                    <TouchableOpacity
+                        style={[primaryButton, { marginTop: 24, marginBottom: 12 }]}
+                        onPress={() => navigation.navigate('RaceControls')}
+                    >
+                        <Text style={primaryButtonText}>Race Details</Text>
                     </TouchableOpacity>
-                    {event.arrival && (
-                        <Text style={styles.detailText}>{event.arrival}</Text>
-                    )}
-                </View>
-            </View>
+                )}
 
-            {event.isRace && (
                 <TouchableOpacity
-                    style={[primaryButton, { marginTop: 24, marginBottom: 12 }]}
-                    onPress={() => navigation.navigate('RaceControls')}
+                    style={[primaryButton, { marginBottom: 80 }]}
+                    onPress={() => navigation.navigate('ManageRegistrations', { folder: getFolderName(event) })}
                 >
-                    <Text style={primaryButtonText}>Race Details</Text>
+                    <Text style={primaryButtonText}>Manage registrations</Text>
                 </TouchableOpacity>
-            )}
 
-            <TouchableOpacity
-                style={[primaryButton, { marginBottom: 80 }]}
-                onPress={() => navigation.navigate('ManageRegistrations', { folder: getFolderName(event) })}
-            >
-                <Text style={primaryButtonText}>Manage registrations</Text>
-            </TouchableOpacity>
-
-            {(
-                (event.ageLimit && event.ageLimit !== 'none' && event.ageLimit !== '0') ||
+                {(event.ageLimit && event.ageLimit !== 'none' && event.ageLimit !== '0') ||
                 (event.medicalRequired && event.medicalRequired !== 'no' && event.medicalRequired !== '0') ||
                 (event.teamEvent && event.teamEvent !== 'no' && event.teamEvent !== '0') ||
-                (event.genderRestriction && event.genderRestriction !== 'any' && event.genderRestriction !== 'no')
-            ) && (
-                <View style={styles.moreDetailsBox}>
-                    <Text style={styles.sectionLabel}>Event details:</Text>
-                    {event.ageLimit && event.ageLimit !== 'none' && event.ageLimit !== '0' && (
-                        <Text style={styles.moreDetailText}>
-                            Age limit: {event.ageLimit === '18+' ? '18+' :
-                            event.ageLimit === 'children'
-                                ? `For children only${event.maxChildAge && event.maxChildAge !== '0' ? ` (max age: ${event.maxChildAge})` : ''}`
-                                : event.ageLimit}
-                        </Text>
-                    )}
-                    {event.medicalRequired && event.medicalRequired !== 'no' && event.medicalRequired !== '0' && (
-                        <Text style={styles.moreDetailText}>
-                            Medical certificate: Required
-                        </Text>
-                    )}
-                    {event.teamEvent && event.teamEvent !== 'no' && event.teamEvent !== '0' && (
-                        <Text style={styles.moreDetailText}>
-                            Team event: Yes
-                        </Text>
-                    )}
-                    {event.genderRestriction && event.genderRestriction !== 'any' && event.genderRestriction !== 'no' && (
-                        <Text style={styles.moreDetailText}>
-                            Gender restriction: {event.genderRestriction.charAt(0).toUpperCase() + event.genderRestriction.slice(1)}
-                        </Text>
-                    )}
+                (event.genderRestriction && event.genderRestriction !== 'any' && event.genderRestriction !== 'no') ||
+                (event.description && event.description.trim() !== '') ? (
+                        <View style={{ alignSelf: 'stretch' }}>
+                    <View style={styles.moreDetailsBox}>
+                        <Text style={styles.sectionLabel}>Event details:</Text>
+                        {event.ageLimit && event.ageLimit !== 'none' && event.ageLimit !== '0' && (
+                            <Text style={styles.moreDetailText}>
+                                Age limit: {event.ageLimit === '18+' ? '18+' :
+                                event.ageLimit === 'children'
+                                    ? `For children only${event.maxChildAge && event.maxChildAge !== '0' ? ` (max age: ${event.maxChildAge})` : ''}`
+                                    : event.ageLimit}
+                            </Text>
+                        )}
+                        {event.medicalRequired && event.medicalRequired !== 'no' && event.medicalRequired !== '0' && (
+                            <Text style={styles.moreDetailText}>
+                                Medical certificate: Required
+                            </Text>
+                        )}
+                        {event.teamEvent && event.teamEvent !== 'no' && event.teamEvent !== '0' && (
+                            <Text style={styles.moreDetailText}>
+                                Team event: Yes
+                            </Text>
+                        )}
+                        {event.genderRestriction && event.genderRestriction !== 'any' && event.genderRestriction !== 'no' && (
+                            <Text style={styles.moreDetailText}>
+                                Gender restriction: {event.genderRestriction.charAt(0).toUpperCase() + event.genderRestriction.slice(1)}
+                            </Text>
+                        )}
+                        {event.description && event.description.trim() !== '' && (
+                            <>
+                                <Text style={styles.moreDetailText}>Description / Notes: {event.description}</Text>
+                            </>
+                        )}
+                    </View>
                 </View>
-            )}
-
-            {event.description && event.description.trim() !== '' && (
-                <View style={styles.descriptionBox}>
-                    <Text style={styles.descriptionLabel}>Event description:</Text>
-                    <Text style={styles.descriptionText}>{event.description}</Text>
-                </View>
-            )}
-
+                ) : null}
             </ScrollView>
 
-            <View style={[styles.buttonRow, { marginTop: 60 }]}>
+            <View style={[UNIFIED_STYLES.buttonRow, { marginTop: 60 }]}>
                 <TouchableOpacity
                     style={secondaryButton}
                     onPress={() => navigation.navigate('EventSelector')}
@@ -186,37 +183,31 @@ export default function EventDetails({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f4f4f4',
-        paddingHorizontal: 24,
-        paddingTop: 48,
-        alignItems: 'center',
-    },
-    title: {
-        fontFamily: FONT,
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 16,
-        color: '#222',
-    },
     topRow: {
         flexDirection: 'row',
-        marginBottom: 24,
+        marginBottom: 18,
+        backgroundColor: '#f0f0f0',
+        alignSelf: 'stretch',
+        padding: 8,
+        paddingInline: 60,
     },
     logoBox: {
-        width: 120,
-        height: 120,
-        borderWidth: 1,
-        borderColor: '#bbb',
-        backgroundColor: '#fafafa',
+        width: 100,
+        height: 100,
+        borderWidth: 2,
+        borderColor: '#b0b0b0',
+        backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
-        marginRight: 24,
+        marginRight: 18,
+        shadowColor: '#fff',
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 1,
+        shadowRadius: 0,
     },
     logoText: {
-        fontFamily: FONT,
-        fontSize: 14,
+        fontFamily: Platform.OS === 'ios' ? 'System' : 'monospace',
+        fontSize: 13,
         color: '#888',
     },
     logoImage: {
@@ -227,84 +218,70 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     detailText: {
-        fontFamily: FONT,
-        fontSize: 16,
+        fontFamily: Platform.OS === 'ios' ? 'System' : 'monospace',
+        fontSize: 15,
         color: '#222',
-        marginBottom: 6,
+        marginBottom: 4,
+
     },
     sectionLabel: {
-        fontFamily: FONT,
-        fontSize: 15,
+        fontFamily: Platform.OS === 'ios' ? 'System' : 'monospace',
+        fontSize: 20,
         fontWeight: 'bold',
-        color: '#555',
-        marginBottom: 8,
+        color: '#003399',
+        marginBottom: 15,
+        textShadowColor: '#fff',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 0,
     },
     moreDetailsBox: {
-        marginTop: 18,
-        padding: 14,
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
-        shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 2,
-        marginBottom: 8,
+        marginHorizontal: 40, // instead of paddingInline
+        marginTop: 12,
+        padding: 10,
+        backgroundColor: '#f0f0f0',
+
+        shadowRadius: 0,
+        marginBottom: 6,
+        alignSelf: 'center',
+        minWidth: 260, // optional, for better look on wide screens
+        maxWidth: 600, // optional, to prevent stretching on web
     },
     moreDetailText: {
-        fontFamily: FONT,
-        fontSize: 16,
+        fontFamily: Platform.OS === 'ios' ? 'System' : 'monospace',
+        fontSize: 15,
         color: '#222',
         marginBottom: 10,
         fontWeight: '500',
     },
     linkText: {
-        fontFamily: FONT,
-        fontSize: 16,
-        color: '#007AFF',
+        fontFamily: Platform.OS === 'ios' ? 'System' : 'monospace',
+        fontSize: 15,
+        color: '#003399',
         textDecorationLine: 'underline',
-    },
-    buttonRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        gap: 24,
+        fontWeight: 'bold',
     },
     error: {
-        fontFamily: FONT,
-        fontSize: 16,
-        color: 'red',
+        fontFamily: Platform.OS === 'ios' ? 'System' : 'monospace',
+        fontSize: 15,
+        color: '#b22222',
+        backgroundColor: '#fff8f8',
+        borderWidth: 2,
+        borderColor: '#b0b0b0',
+        padding: 8,
+        margin: 8,
+        alignSelf: 'stretch',
+        textAlign: 'center',
     },
     loading: {
-        fontFamily: FONT,
-        fontSize: 16,
+        fontFamily: Platform.OS === 'ios' ? 'System' : 'monospace',
+        fontSize: 15,
         color: '#555',
-    },
-    descriptionBox: {
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
-        padding: 14,
-        marginTop: 8,
-        marginBottom: 12,
-        shadowColor: '#000',
-        shadowOpacity: 0.04,
-        shadowRadius: 3,
-        shadowOffset: { width: 0, height: 1 },
-        elevation: 1,
-    },
-    descriptionLabel: {
-        fontFamily: FONT,
-        fontSize: 15,
-        fontWeight: 'bold',
-        color: '#444',
-        marginBottom: 6,
-    },
-    descriptionText: {
-        fontFamily: FONT,
-        fontSize: 15,
-        color: '#222',
+        backgroundColor: '#f0f0f0',
+        borderWidth: 2,
+        borderColor: '#b0b0b0',
+        padding: 8,
+        margin: 8,
+        alignSelf: 'stretch',
+        textAlign: 'center',
     },
 });

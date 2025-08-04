@@ -10,12 +10,12 @@ import {
     saveButton, saveButtonText,
     deleteButton, deleteButtonText,
     cancelButton, cancelButtonText
-} from "../../components/constants";
+} from "../../components/buttons_styles";
+import { UNIFIED_STYLES } from '../../components/constants';
 import { validateParticipant } from '../../utils/validateParticipant';
 
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
-
-const roles = ['spectator', 'runner']; // spectator = глядач, runner = учасник
+const roles = ['spectator', 'runner'];
 
 export default function ManageRegistrations({ route, navigation }) {
     const folder = route.params?.folder;
@@ -26,14 +26,6 @@ export default function ManageRegistrations({ route, navigation }) {
     const [editParticipant, setEditParticipant] = useState({});
     const [validationErrors, setValidationErrors] = useState({});
     const [eventRestrictions, setEventRestrictions] = useState(null);
-
-
-    // const eventRestrictions = {
-    //     ...route.params?.eventRestrictions,
-    //     isRace:
-    //         route.params?.eventRestrictions?.isRace === true ||
-    //         route.params?.eventRestrictions?.isRace === 'true'
-    // };
 
     useEffect(() => {
         if (!folder) return;
@@ -48,22 +40,6 @@ export default function ManageRegistrations({ route, navigation }) {
                 });
             })
             .catch(() => setError('Failed to load event restrictions'));
-    }, [folder]);
-
-    // Fetch participants
-    useEffect(() => {
-        if (!folder) return;
-        setLoading(true);
-        fetch(`https://events-server-eu5z.onrender.com/api/events/${folder}/participants`)
-            .then(res => res.json())
-            .then(data => {
-                setParticipants(data);
-                setLoading(false);
-            })
-            .catch(() => {
-                setError('Failed to load participants');
-                setLoading(false);
-            });
     }, [folder]);
 
     useEffect(() => {
@@ -125,7 +101,7 @@ export default function ManageRegistrations({ route, navigation }) {
                         <View style={styles.card} key={idx}>
                             <Text style={styles.label}>Name</Text>
                             <TextInput
-                                style={styles.input}
+                                style={UNIFIED_STYLES.input}
                                 value={editParticipant.name}
                                 onChangeText={name => setEditParticipant({ ...editParticipant, name })}
                                 placeholder="Name"
@@ -134,7 +110,7 @@ export default function ManageRegistrations({ route, navigation }) {
 
                             <Text style={styles.label}>Surname</Text>
                             <TextInput
-                                style={styles.input}
+                                style={UNIFIED_STYLES.input}
                                 value={editParticipant.surname}
                                 onChangeText={surname => setEditParticipant({ ...editParticipant, surname })}
                                 placeholder="Surname"
@@ -143,7 +119,7 @@ export default function ManageRegistrations({ route, navigation }) {
 
                             <Text style={styles.label}>Age</Text>
                             <TextInput
-                                style={styles.input}
+                                style={UNIFIED_STYLES.input}
                                 value={editParticipant.age?.toString()}
                                 onChangeText={age => setEditParticipant({ ...editParticipant, age })}
                                 keyboardType="numeric"
@@ -153,7 +129,7 @@ export default function ManageRegistrations({ route, navigation }) {
 
                             <Text style={styles.label}>Gender</Text>
                             <TextInput
-                                style={styles.input}
+                                style={UNIFIED_STYLES.input}
                                 value={editParticipant.gender}
                                 onChangeText={gender => setEditParticipant({ ...editParticipant, gender })}
                                 placeholder="Gender"
@@ -162,7 +138,7 @@ export default function ManageRegistrations({ route, navigation }) {
 
                             <Text style={styles.label}>Email</Text>
                             <TextInput
-                                style={styles.input}
+                                style={UNIFIED_STYLES.input}
                                 value={editParticipant.email}
                                 onChangeText={email => setEditParticipant({ ...editParticipant, email })}
                                 placeholder="Email"
@@ -171,7 +147,7 @@ export default function ManageRegistrations({ route, navigation }) {
 
                             <Text style={styles.label}>Phone</Text>
                             <TextInput
-                                style={styles.input}
+                                style={UNIFIED_STYLES.input}
                                 value={editParticipant.phone}
                                 onChangeText={phone => setEditParticipant({ ...editParticipant, phone })}
                                 placeholder="Phone"
@@ -281,7 +257,7 @@ export default function ManageRegistrations({ route, navigation }) {
                 )}
             </ScrollView>
 
-            <View style={styles.buttonRow}>
+            <View style={UNIFIED_STYLES.buttonRow}>
                 <TouchableOpacity
                     style={secondaryButton}
                     onPress={() => navigation.navigate('EventSelector')}
@@ -341,21 +317,6 @@ const styles = StyleSheet.create({
         marginBottom: 2,
         fontFamily: 'System',
     },
-    input: {
-        backgroundColor: '#fff',
-        borderWidth: 2,
-        borderColor: '#b0b0b0',
-        borderRadius: 0,
-        padding: 6,
-        marginBottom: 4,
-        fontFamily: 'System',
-        fontSize: 15,
-        color: '#222',
-        shadowColor: '#fff',
-        shadowOffset: { width: 1, height: 1 },
-        shadowOpacity: 1,
-        shadowRadius: 0,
-    },
     actions: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
@@ -386,13 +347,5 @@ const styles = StyleSheet.create({
         color: '#003399',
         fontWeight: 'bold',
         fontFamily: 'System',
-    },
-    buttonRow: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        padding: 16,
-        backgroundColor: '#e0e0e0',
-        borderTopWidth: 2,
-        borderColor: '#b0b0b0',
     },
 });

@@ -5,11 +5,12 @@ import {
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-}from '../../components/constants';
+} from '../../components/buttons_styles';
+import { UNIFIED_STYLES } from '../../components/constants';
 
 export default function HomeScreen({ navigation }) {
     return (
-        <View style={styles.container}>
+        <View style={UNIFIED_STYLES.container}>
             {/* Pixel-art logo */}
             <View style={styles.logoContainer}>
                 {/* 5x5 grid */}
@@ -35,7 +36,7 @@ export default function HomeScreen({ navigation }) {
                 ))}
             </View>
             {/* Buttons */}
-            <View style={styles.buttonRow}>
+            <View style={UNIFIED_STYLES.buttonRow}>
                 <TouchableOpacity style={secondaryButton}>
                     <Text style={secondaryButtonText}>EXIT</Text>
                 </TouchableOpacity>
@@ -53,12 +54,6 @@ export default function HomeScreen({ navigation }) {
 const PIXEL_SIZE = 24;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f5f5f5',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
     logoContainer: {
         marginBottom: 100,
         alignItems: 'center',
@@ -67,8 +62,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     logoPixel: {
-        width: PIXEL_SIZE,
-        height: PIXEL_SIZE,
+        width: PIXEL_SIZE*1.5,
+        height: PIXEL_SIZE*1.5,
         backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: '#bbb',
@@ -78,9 +73,5 @@ const styles = StyleSheet.create({
     },
     logoPixelRed: {
         backgroundColor: '#d00',
-    },
-    buttonRow: {
-        flexDirection: 'row',
-        gap: 24,
     },
 });

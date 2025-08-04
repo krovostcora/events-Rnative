@@ -14,9 +14,9 @@ import {
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-} from '../../components/constants';
+} from '../../components/buttons_styles';
+import { UNIFIED_STYLES } from '../../components/constants';
 import { validateParticipant } from '../../utils/validateParticipant';
-
 
 const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
 
@@ -98,7 +98,6 @@ export default function Registration({ navigation, route }) {
     const handleChange = (name, value) => {
         setForm(prev => ({ ...prev, [name]: value }));
 
-        // Clear error when field changes
         if (validationErrors[name]) {
             setValidationErrors(prev => ({ ...prev, [name]: '' }));
         }
@@ -136,9 +135,6 @@ export default function Registration({ navigation, route }) {
                 payload.raceRole = normalizedForm.raceRole || 'spectator';
             }
 
-            console.log('Submitting to folder:', folderName);
-            console.log('Payload:', JSON.stringify(payload, null, 2));
-
             const response = await fetch(
                 `https://events-server-eu5z.onrender.com/api/events/${folderName}/register`,
                 {
@@ -161,7 +157,6 @@ export default function Registration({ navigation, route }) {
                 { text: 'OK', onPress: () => navigation.navigate('EventSelector') },
             ]);
         } catch (error) {
-            console.error('Registration error:', error);
             Alert.alert('Error', error.message || 'Failed to register. Please try again.');
         } finally {
             setIsSubmitting(false);
@@ -173,16 +168,15 @@ export default function Registration({ navigation, route }) {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={UNIFIED_STYLES.container}>
             <Text style={styles.title}>Register as a Participant</Text>
 
             <ScrollView
                 contentContainerStyle={styles.formBody}
                 keyboardShouldPersistTaps="handled"
             >
-                {/* Name Input */}
                 <TextInput
-                    style={styles.input}
+                    style={UNIFIED_STYLES.input}
                     placeholder="Name *"
                     placeholderTextColor="#aaa"
                     value={form.name}
@@ -190,9 +184,8 @@ export default function Registration({ navigation, route }) {
                 />
                 {validationErrors.name && <Text style={styles.error}>{validationErrors.name}</Text>}
 
-                {/* Surname Input */}
                 <TextInput
-                    style={styles.input}
+                    style={UNIFIED_STYLES.input}
                     placeholder="Surname *"
                     placeholderTextColor="#aaa"
                     value={form.surname}
@@ -200,7 +193,6 @@ export default function Registration({ navigation, route }) {
                 />
                 {validationErrors.surname && <Text style={styles.error}>{validationErrors.surname}</Text>}
 
-                {/* Gender Selection */}
                 <View style={styles.genderRow}>
                     <Text style={styles.genderLabel}>Gender:</Text>
                     <GenderRadio
@@ -210,9 +202,8 @@ export default function Registration({ navigation, route }) {
                 </View>
                 {validationErrors.gender && <Text style={styles.error}>{validationErrors.gender}</Text>}
 
-                {/* Age Input */}
                 <TextInput
-                    style={styles.input}
+                    style={UNIFIED_STYLES.input}
                     placeholder="Age *"
                     placeholderTextColor="#aaa"
                     value={form.age}
@@ -221,9 +212,8 @@ export default function Registration({ navigation, route }) {
                 />
                 {validationErrors.age && <Text style={styles.error}>{validationErrors.age}</Text>}
 
-                {/* Email Input */}
                 <TextInput
-                    style={styles.input}
+                    style={UNIFIED_STYLES.input}
                     placeholder="Email"
                     placeholderTextColor="#aaa"
                     value={form.email}
@@ -233,9 +223,8 @@ export default function Registration({ navigation, route }) {
                 />
                 {validationErrors.email && <Text style={styles.error}>{validationErrors.email}</Text>}
 
-                {/* Phone Input */}
                 <TextInput
-                    style={styles.input}
+                    style={UNIFIED_STYLES.input}
                     placeholder="Phone"
                     placeholderTextColor="#aaa"
                     value={form.phone}
@@ -244,7 +233,6 @@ export default function Registration({ navigation, route }) {
                 />
                 {validationErrors.phone && <Text style={styles.error}>{validationErrors.phone}</Text>}
 
-                {/* Race Role (if event is race) */}
                 {eventRestrictions.isRace && (
                     <>
                         <Text style={styles.genderLabel}>Race role:</Text>
@@ -259,8 +247,7 @@ export default function Registration({ navigation, route }) {
                 )}
             </ScrollView>
 
-            {/* Buttons */}
-            <View style={styles.buttonRow}>
+            <View style={UNIFIED_STYLES.buttonRow}>
                 <TouchableOpacity
                     style={secondaryButton}
                     onPress={handleCancel}
@@ -284,12 +271,6 @@ export default function Registration({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f4f4f4',
-        alignItems: 'center',
-        paddingTop: 48,
-    },
     title: {
         fontFamily: FONT,
         fontSize: 20,
@@ -304,35 +285,12 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         paddingBottom: 120,
     },
-    input: {
-        width: '100%',
-        height: 44,
-        borderWidth: 1,
-        borderColor: '#bbb',
-        backgroundColor: '#fff',
-        fontFamily: FONT,
-        fontSize: 16,
-        color: '#222',
-        marginBottom: 10,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-        marginVertical: 12,
-        borderRadius: 0,
-    },
     error: {
         color: 'red',
         fontFamily: FONT,
         fontSize: 13,
         marginBottom: 6,
         marginLeft: 2,
-    },
-    buttonRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: 320,
-        position: 'absolute',
-        bottom: 36,
-        left: 24,
     },
     genderRow: {
         flexDirection: 'row',
