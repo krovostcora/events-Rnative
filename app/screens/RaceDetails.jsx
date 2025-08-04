@@ -2,13 +2,15 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Modal } from 'react-native';
 import {
-    optionsButton,
-    optionsButtonText,
-    primaryButton,
-    primaryButtonText,
-    secondaryButton,
-    secondaryButtonText,
-} from '../../components/constants';
+    primaryButton, primaryButtonText,
+    secondaryButton, secondaryButtonText,
+    editButton, editButtonText,
+    saveButton, saveButtonText,
+    deleteButton, deleteButtonText,
+    cancelButton, cancelButtonText,
+    optionsButton, optionsButtonText
+} from "../../components/constants";
+
 import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
 
@@ -161,17 +163,12 @@ export default function RaceDetails({ navigation }) {
         </View>
     );
 
-
-
-
     return (
         <View style={styles.container}>
-
             <Text style={styles.timerDisplay}>{formatTime(time)}</Text>
 
             <FlatList
                 data={entries}
-                renderItem={renderRow}
                 keyExtractor={(item, index) => index.toString()}
                 ListHeaderComponent={
                     <View style={styles.headerRow}>
@@ -184,7 +181,6 @@ export default function RaceDetails({ navigation }) {
                                 {' '}{sortBy === 'id' ? (sortOrder === 'asc' ? '↑' : '↓') : '↕'}
                             </Text>
                         </TouchableOpacity>
-
                         <TouchableOpacity
                             style={[styles.headerCell, { flex: 1.1 }]}
                             onPress={() => sortEntries('time')}
@@ -194,12 +190,50 @@ export default function RaceDetails({ navigation }) {
                                 {' '}{sortBy === 'time' ? (sortOrder === 'asc' ? '↑' : '↓') : '↕'}
                             </Text>
                         </TouchableOpacity>
-
                         <View style={[styles.headerCell, { flex: 2 }]}>
                             <Text style={styles.headerBold}>Options</Text>
                         </View>
                     </View>
                 }
+                renderItem={({ item, index }) => (
+                    <View style={styles.row}>
+                        <Text style={[styles.cellId, { flex: 0.6 }]}>{item.id}</Text>
+                        <Text style={[styles.cellTime, { flex: 1.1 }]}>{item.time}</Text>
+                        <View style={[styles.cellOptions, { flex: 2 }]}>
+                            {editIndex === index ? (
+                                <>
+                                    <TouchableOpacity
+                                        style={saveButton}
+                                        onPress={handleSaveEdit}
+                                    >
+                                        <Text style={saveButtonText}>Save</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={cancelButton}
+                                        onPress={() => setEditIndex(null)}
+                                    >
+                                        <Text style={cancelButtonText}>Cancel</Text>
+                                    </TouchableOpacity>
+                                </>
+                            ) : (
+                                <>
+                                    <TouchableOpacity
+                                        style={editButton}
+                                        onPress={() => handleEdit(index)}
+                                    >
+                                        <Text style={editButtonText}>Edit</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={deleteButton}
+                                        onPress={() => handleDelete(index)}
+                                    >
+                                        <Text style={deleteButtonText}>Delete</Text>
+                                    </TouchableOpacity>
+                                </>
+                            )}
+                        </View>
+                    </View>
+                )}
             />
 
             <TouchableOpacity style={primaryButton} onPress={toggleTimer}>
