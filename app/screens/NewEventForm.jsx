@@ -10,7 +10,7 @@ import {
 } from '../../components/buttons_styles';
 import { UNIFIED_STYLES } from '../../components/constants';
 
-const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
+const FONT = Platform.OS === 'ios' ? 'System' : 'monospace';
 
 async function sendEventToServer(form) {
     const generateId = () => Math.random().toString(36).substring(2, 10) + Date.now();
@@ -96,18 +96,17 @@ export default function NewEventForm({ navigation }) {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={0}
         >
-            <View style={[UNIFIED_STYLES.container, { paddingHorizontal: 20 }]}>
+            <View style={UNIFIED_STYLES.container}>
                 <ScrollView
                     style={{ alignSelf: 'stretch' }}
                     contentContainerStyle={{
-                        maxWidth: 640,
                         alignSelf: 'center',
                         paddingBottom: 100,
                     }}
                     keyboardShouldPersistTaps="handled"
                 >
                 <TextInput
-                    style={UNIFIED_STYLES.input}
+                    style={[UNIFIED_STYLES.input, { marginBottom: 20, fontSize: 20, fontFamily: FONT}]}
                     value={form.name}
                     onChangeText={text => setForm({ ...form, name: text })}
                     placeholder="Write the name of the event"
@@ -241,7 +240,7 @@ export default function NewEventForm({ navigation }) {
                     >
                         {form.isRace && <View style={styles.radioInner} />}
                     </TouchableOpacity>
-                    <Text style={{ fontFamily: FONT, fontSize: 16, color: '#222' }}>It's a race</Text>
+                    <Text style={{ fontFamily: FONT, fontSize: 20, color: '#222', marginTop: 20 }}>It's a race</Text>
                 </View>
 
                 {/* Age Limit Radio Buttons */}
@@ -343,10 +342,11 @@ export default function NewEventForm({ navigation }) {
     );
 }
 
+
 const styles = StyleSheet.create({
     logoBox: {
-        width: 122,
-        height: 122,
+        width: 150,
+        height: 150,
         borderWidth: 1,
         borderColor: '#bbb',
         backgroundColor: '#fafafa',
@@ -358,12 +358,12 @@ const styles = StyleSheet.create({
     },
     logoText: {
         fontFamily: FONT,
-        fontSize: 14,
+        fontSize: 20,
         color: '#888',
         textAlign: 'center',
     },
     webInputDate: {
-        width: 289,
+        width: 300,
         height: 44,
         borderWidth: 1,
         borderColor: '#bbb',
@@ -377,6 +377,7 @@ const styles = StyleSheet.create({
         paddingRight: 15,
     },
     radioOuter: {
+        marginTop: 20,
         width: 20,
         height: 20,
         borderRadius: 10,
@@ -405,12 +406,14 @@ const styles = StyleSheet.create({
     },
     radioLabel: {
         fontFamily: FONT,
-        fontSize: 15,
+        fontSize: 18,
         color: '#222',
+        marginTop: 20
     },
     sectionLabel: {
+        fontWeight: 'bold',
         fontFamily: FONT,
-        fontSize: 16,
+        fontSize: 18,
         color: '#222',
         marginBottom: 6,
     },

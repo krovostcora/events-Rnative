@@ -187,13 +187,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginBottom: 18,
         backgroundColor: '#f0f0f0',
-        alignSelf: 'stretch',
+        alignSelf: 'center',
         padding: 8,
         paddingInline: 60,
     },
     logoBox: {
-        width: 100,
-        height: 100,
+        width: 150,
+        height: 150,
         borderWidth: 2,
         borderColor: '#b0b0b0',
         backgroundColor: '#fff',
@@ -216,12 +216,13 @@ const styles = StyleSheet.create({
     },
     detailsBox: {
         justifyContent: 'center',
+        paddingInline: 10,
     },
     detailText: {
         fontFamily: Platform.OS === 'ios' ? 'System' : 'monospace',
-        fontSize: 15,
+        fontSize: 18,
         color: '#222',
-        marginBottom: 4,
+        marginBottom: 10,
 
     },
     sectionLabel: {

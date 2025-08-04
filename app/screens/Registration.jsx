@@ -176,7 +176,7 @@ export default function Registration({ navigation, route }) {
                 keyboardShouldPersistTaps="handled"
             >
                 <TextInput
-                    style={UNIFIED_STYLES.input}
+                    style={[UNIFIED_STYLES.input, { marginBottom: 20, marginTop: 20 }]}
                     placeholder="Name *"
                     placeholderTextColor="#aaa"
                     value={form.name}
@@ -185,7 +185,7 @@ export default function Registration({ navigation, route }) {
                 {validationErrors.name && <Text style={styles.error}>{validationErrors.name}</Text>}
 
                 <TextInput
-                    style={UNIFIED_STYLES.input}
+                    style={[UNIFIED_STYLES.input, { marginBottom: 20 }]}
                     placeholder="Surname *"
                     placeholderTextColor="#aaa"
                     value={form.surname}
@@ -203,7 +203,7 @@ export default function Registration({ navigation, route }) {
                 {validationErrors.gender && <Text style={styles.error}>{validationErrors.gender}</Text>}
 
                 <TextInput
-                    style={UNIFIED_STYLES.input}
+                    style={[UNIFIED_STYLES.input, { marginBottom: 20 }]}
                     placeholder="Age *"
                     placeholderTextColor="#aaa"
                     value={form.age}
@@ -213,7 +213,7 @@ export default function Registration({ navigation, route }) {
                 {validationErrors.age && <Text style={styles.error}>{validationErrors.age}</Text>}
 
                 <TextInput
-                    style={UNIFIED_STYLES.input}
+                    style={[UNIFIED_STYLES.input, { marginBottom: 20 }]}
                     placeholder="Email"
                     placeholderTextColor="#aaa"
                     value={form.email}
@@ -224,7 +224,7 @@ export default function Registration({ navigation, route }) {
                 {validationErrors.email && <Text style={styles.error}>{validationErrors.email}</Text>}
 
                 <TextInput
-                    style={UNIFIED_STYLES.input}
+                    style={[UNIFIED_STYLES.input, { marginBottom: 20 }]}
                     placeholder="Phone"
                     placeholderTextColor="#aaa"
                     value={form.phone}
@@ -295,8 +295,8 @@ const styles = StyleSheet.create({
     genderRow: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginBottom: 12,
-        marginTop: 12,
+        marginTop: 10,
+        marginBottom: 20,
     },
     radioButton: {
         flexDirection: 'row',
@@ -322,6 +322,8 @@ const styles = StyleSheet.create({
         color: '#222',
         marginRight: 18,
         alignSelf: 'center',
+        marginTop: 10,
+        marginBottom: 20,
     },
     radioLabel: {
         fontFamily: FONT,
