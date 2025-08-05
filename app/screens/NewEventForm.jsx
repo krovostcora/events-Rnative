@@ -96,232 +96,246 @@ export default function NewEventForm({ navigation }) {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={0}
         >
-            <View style={UNIFIED_STYLES.container}>
-                <ScrollView
-                    style={{ alignSelf: 'stretch' }}
-                    contentContainerStyle={{
-                        alignSelf: 'center',
-                        paddingBottom: 100,
-                    }}
-                    keyboardShouldPersistTaps="handled"
-                >
-                <TextInput
-                    style={[UNIFIED_STYLES.input, { marginBottom: 20, fontSize: 20, fontFamily: FONT}]}
-                    value={form.name}
-                    onChangeText={text => setForm({ ...form, name: text })}
-                    placeholder="Write the name of the event"
-                    placeholderTextColor="#aaa"
-                />
+            <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContent}
+                keyboardShouldPersistTaps="handled"
+            >
+                <View style={styles.container}>
+                    <Text style={UNIFIED_STYLES.title}>New Event</Text>
 
-                <TouchableOpacity style={styles.logoBox} onPress={handlePickLogo} activeOpacity={0.7}>
-                    <Text style={styles.logoText}>
-                        {form.logo ? form.logo.name : 'Upload logo (.png)'}
-                    </Text>
-                </TouchableOpacity>
-
-                {/* Date Picker */}
-                {Platform.OS === 'web' ? (
-                    <input
-                        type="date"
-                        value={form.date}
-                        onChange={e => setForm({ ...form, date: e.target.value })}
-                        style={styles.webInputDate}
-                    />
-                ) : (
-                    <>
-                        <TouchableOpacity
-                            onPress={() =>
-                                setShowDatePicker({ mode: 'date', visible: true })
-                            }
-                            style={UNIFIED_STYLES.input}
-                        >
-                            <Text style={{ fontFamily: FONT, fontSize: 16, lineHeight: 44, color: form.date ? '#222' : '#aaa' }}>
-                                {form.date || 'Date (YYYY-MM-DD)'}
-                            </Text>
-                        </TouchableOpacity>
-                        {showDatePicker.visible && showDatePicker.mode === 'date' && (
-                            <DateTimePicker
-                                value={form.date ? new Date(form.date) : new Date()}
-                                mode="date"
-                                display={Platform.OS === 'ios' ? 'inline' : 'calendar'}
-                                onChange={(event, selectedDate) => {
-                                    setShowDatePicker({ mode: null, visible: false });
-                                    if (selectedDate) {
-                                        setForm({ ...form, date: selectedDate.toISOString().slice(0, 10) });
-                                    }
-                                }}
-                            />
-                        )}
-                    </>
-                )}
-
-                {/* Time Picker */}
-                {Platform.OS === 'web' ? (
-                    <input
-                        type="time"
-                        value={form.time}
-                        onChange={e => setForm({ ...form, time: e.target.value })}
-                        style={styles.webInputDate}
-                    />
-                ) : (
-                    <>
-                        <TouchableOpacity
-                            onPress={() =>
-                                setShowDatePicker({ mode: 'time', visible: true })
-                            }
-                            style={UNIFIED_STYLES.input}
-                        >
-                            <Text style={{ fontFamily: FONT, fontSize: 16, lineHeight: 44, color: form.time ? '#222' : '#aaa' }}>
-                                {form.time || 'Time (HH:MM)'}
-                            </Text>
-                        </TouchableOpacity>
-                        {showDatePicker.visible && showDatePicker.mode === 'time' && (
-                            <DateTimePicker
-                                value={new Date()}
-                                mode="time"
-                                display="spinner"
-                                is24Hour={true}
-                                onChange={(event, selectedTime) => {
-                                    setShowDatePicker({ mode: null, visible: false });
-                                    if (selectedTime) {
-                                        const hours = selectedTime.getHours().toString().padStart(2, '0');
-                                        const minutes = selectedTime.getMinutes().toString().padStart(2, '0');
-                                        setForm({ ...form, time: `${hours}:${minutes}` });
-                                    }
-                                }}
-                            />
-                        )}
-                    </>
-                )}
-
-                {/* Place Input and Map Picker */}
-                <TextInput
-                    style={UNIFIED_STYLES.input}
-                    placeholder="Place"
-                    placeholderTextColor="#aaa"
-                    value={typeof form.place === 'string' ? form.place : ''}
-                    editable={typeof form.place === 'string'}
-                    onChangeText={text => {
-                        if (typeof form.place !== 'string' && form.place) {
-                            setWarning('Clear map selection to type a place.');
-                        } else {
-                            setWarning('');
-                            setForm({ ...form, place: text });
-                        }
-                    }}
-                />
-                <TouchableOpacity
-                    style={[UNIFIED_STYLES.input, { opacity: typeof form.place === 'string' && form.place.length > 0 ? 0.5 : 1 }]}
-                    disabled={typeof form.place === 'string' && form.place.length > 0}
-                    onPress={() => {
-                        if (typeof form.place === 'string' && form.place.length > 0) {
-                            setWarning('Clear text input to choose a place on the map.');
-                        } else {
-                            setWarning('');
-                            navigation.navigate('MapScreen', {
-                                onSelect: coords => setForm({ ...form, place: coords }),
-                            });
-                        }
-                    }}
-                >
-                    <Text style={{ fontFamily: FONT, fontSize: 16, lineHeight: 44, color: form.place ? '#222' : '#aaa' }}>
-                        {typeof form.place === 'object' ? 'Place selected on map' : (form.place || 'Choose place on map')}
-                    </Text>
-                </TouchableOpacity>
-                {warning ? (
-                    <Text style={{ color: 'red', marginBottom: 8, fontFamily: FONT }}>{warning}</Text>
-                ) : null}
-
-                {/* Race Toggle */}
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 14 }}>
-                    <TouchableOpacity
-                        onPress={() => setForm({ ...form, isRace: !form.isRace })}
-                        style={styles.radioOuter}
-                    >
-                        {form.isRace && <View style={styles.radioInner} />}
-                    </TouchableOpacity>
-                    <Text style={{ fontFamily: FONT, fontSize: 20, color: '#222', marginTop: 20 }}>It's a race</Text>
-                </View>
-
-                {/* Age Limit Radio Buttons */}
-                <View style={{ marginBottom: 14 }}>
-                    <Text style={styles.sectionLabel}>Age limit</Text>
-                    {['none', '18+', 'children'].map(option => (
-                        <TouchableOpacity
-                            key={option}
-                            onPress={() => setForm({ ...form, ageLimit: option })}
-                            style={styles.radioRow}
-                        >
-                            <View style={styles.radioOuter}>
-                                {form.ageLimit === option && <View style={styles.radioInnerBlue} />}
-                            </View>
-                            <Text style={styles.radioLabel}>
-                                {option === 'none' ? 'No limit' : option === '18+' ? '18+' : 'For children only'}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
-                    {form.ageLimit === 'children' && (
+                    <View style={styles.field}>
+                        <Text style={styles.label}>Event name</Text>
                         <TextInput
-                            style={[UNIFIED_STYLES.input, { width: 120 }]}
-                            placeholder="Max age"
-                            keyboardType="numeric"
-                            value={form.maxChildAge}
-                            onChangeText={text => setForm({ ...form, maxChildAge: text })}
+                            style={styles.input}
+                            value={form.name}
+                            onChangeText={text => setForm({ ...form, name: text })}
                         />
-                    )}
-                </View>
+                    </View>
 
-                {/* Other Dynamic Fields */}
-                <View style={{ marginBottom: 14 }}>
-                    <TouchableOpacity
-                        onPress={() => setForm({ ...form, medicalRequired: !form.medicalRequired })}
-                        style={styles.radioRow}
-                    >
-                        <View style={styles.radioOuter}>
-                            {form.medicalRequired && <View style={styles.radioInnerBlue} />}
-                        </View>
-                        <Text style={styles.radioLabel}>Requires medical certificate</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => setForm({ ...form, teamEvent: !form.teamEvent })}
-                        style={styles.radioRow}
-                    >
-                        <View style={styles.radioOuter}>
-                            {form.teamEvent && <View style={styles.radioInnerBlue} />}
-                        </View>
-                        <Text style={styles.radioLabel}>Team event</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Gender Restriction Radio Buttons */}
-                <View style={{ marginBottom: 14 }}>
-                    <Text style={styles.sectionLabel}>Gender restriction</Text>
-                    {['any', 'male', 'female'].map(option => (
-                        <TouchableOpacity
-                            key={option}
-                            onPress={() => setForm({ ...form, genderRestriction: option })}
-                            style={styles.radioRow}
-                        >
-                            <View style={styles.radioOuter}>
-                                {form.genderRestriction === option && <View style={styles.radioInnerBlue} />}
-                            </View>
-                            <Text style={styles.radioLabel}>
-                                {option === 'any' ? 'Any' : option.charAt(0).toUpperCase() + option.slice(1)}
+                    <View style={styles.centerAligned}>
+                        <TouchableOpacity style={styles.logoBox} onPress={handlePickLogo} activeOpacity={0.7}>
+                            <Text style={styles.logoText}>
+                                {form.logo ? form.logo.name : 'Upload logo (.png)'}
                             </Text>
                         </TouchableOpacity>
-                    ))}
-                </View>
+                    </View>
 
-                {/* Description Input */}
-                <TextInput
-                    style={[UNIFIED_STYLES.input, { height: 150, maxHeight: 150, textAlignVertical: 'top', marginBottom: 24 }]}
-                    value={form.description}
-                    onChangeText={text => setForm({ ...form, description: text })}
-                    placeholder="Event description"
-                    placeholderTextColor="#aaa"
-                    multiline
-                    numberOfLines={4}
-                />
+                    <View style={styles.section}>
+                        <Text style={styles.sectionLabel}>Date & Time</Text>
+                        <View style={styles.row}>
+                            <View style={styles.column}>
+                                <Text style={styles.label}>Date</Text>
+                                {Platform.OS === 'web' ? (
+                                    <input
+                                        type="date"
+                                        value={form.date}
+                                        onChange={e => setForm({ ...form, date: e.target.value })}
+                                        style={styles.webInputDate}
+                                    />
+                                ) : (
+                                    <>
+                                        <TouchableOpacity
+                                            onPress={() => setShowDatePicker({ mode: 'date', visible: true })}
+                                            style={styles.input}
+                                        >
+                                            <Text style={styles.inputText}>
+                                                {form.date || 'YYYY-MM-DD'}
+                                            </Text>
+                                        </TouchableOpacity>
+                                        {showDatePicker.visible && showDatePicker.mode === 'date' && (
+                                            <View style={{ marginLeft: -12 }}>
+                                                <DateTimePicker
+                                                    value={form.date ? new Date(form.date) : new Date()}
+                                                    mode="date"
+                                                    display={Platform.OS === 'ios' ? 'inline' : 'calendar'}
+                                                    onChange={(event, selectedDate) => {
+                                                        setShowDatePicker({ mode: null, visible: false });
+                                                        if (selectedDate) {
+                                                            setForm({ ...form, date: selectedDate.toISOString().slice(0, 10) });
+                                                        }
+                                                    }}
+                                                />
+                                            </View>
+                                        )}
+                                    </>
+                                )}
+                            </View>
+                            <View style={styles.column}>
+                                <Text style={styles.label}>Time</Text>
+                                {Platform.OS === 'web' ? (
+                                    <input
+                                        type="time"
+                                        value={form.time}
+                                        onChange={e => setForm({ ...form, time: e.target.value })}
+                                        style={styles.webInputDate}
+                                    />
+                                ) : (
+                                    <>
+                                        <TouchableOpacity
+                                            onPress={() => setShowDatePicker({ mode: 'time', visible: true })}
+                                            style={styles.input}
+                                        >
+                                            <Text style={styles.inputText}>
+                                                {form.time || 'HH:MM'}
+                                            </Text>
+                                        </TouchableOpacity>
+                                        {showDatePicker.visible && showDatePicker.mode === 'time' && (
+                                            <DateTimePicker
+                                                value={new Date()}
+                                                mode="time"
+                                                display="spinner"
+                                                is24Hour={true}
+                                                onChange={(event, selectedTime) => {
+                                                    setShowDatePicker({ mode: null, visible: false });
+                                                    if (selectedTime) {
+                                                        const hours = selectedTime.getHours().toString().padStart(2, '0');
+                                                        const minutes = selectedTime.getMinutes().toString().padStart(2, '0');
+                                                        setForm({ ...form, time: `${hours}:${minutes}` });
+                                                    }
+                                                }}
+                                            />
+                                        )}
+                                    </>
+                                )}
+                            </View>
+                        </View>
+                    </View>
+
+                    <View style={styles.section}>
+                        <Text style={styles.label}>Place</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Place"
+                            placeholderTextColor="#aaa"
+                            value={typeof form.place === 'string' ? form.place : ''}
+                            editable={typeof form.place === 'string'}
+                            onChangeText={text => {
+                                if (typeof form.place !== 'string' && form.place) {
+                                    setWarning('Clear map selection to type a place.');
+                                } else {
+                                    setWarning('');
+                                    setForm({ ...form, place: text });
+                                }
+                            }}
+                        />
+                        <TouchableOpacity
+                            style={[
+                                styles.input,
+                                { opacity: typeof form.place === 'string' && form.place.length > 0 ? 0.5 : 1 },
+                            ]}
+                            disabled={typeof form.place === 'string' && form.place.length > 0}
+                            onPress={() => {
+                                if (typeof form.place === 'string' && form.place.length > 0) {
+                                    setWarning('Clear text input to choose a place on the map.');
+                                } else {
+                                    setWarning('');
+                                    navigation.navigate('MapScreen', {
+                                        onSelect: coords => setForm({ ...form, place: coords }),
+                                    });
+                                }
+                            }}
+                        >
+                            <Text style={styles.inputText}>
+                                {typeof form.place === 'object' ? 'Place selected on map' : (form.place || 'Choose place on map')}
+                            </Text>
+                        </TouchableOpacity>
+                        {warning ? (
+                            <Text style={styles.warning}>{warning}</Text>
+                        ) : null}
+                    </View>
+
+                    <View style={styles.section}>
+                        <Text style={styles.sectionLabel}>Is it a race?</Text>
+                        <TouchableOpacity
+                            onPress={() => setForm({ ...form, isRace: !form.isRace })}
+                            style={styles.radioRowTight}
+                        >
+                            <View style={styles.radioOuter}>
+                                {form.isRace && <View style={styles.radioInner} />}
+                            </View>
+                            <Text style={styles.radioLabel}>Yes, it's a race</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.section}>
+                        <Text style={styles.sectionLabel}>Age limit</Text>
+                        {['none', '18+', 'children'].map(option => (
+                            <TouchableOpacity
+                                key={option}
+                                onPress={() => setForm({ ...form, ageLimit: option })}
+                                style={styles.radioRowTight}
+                            >
+                                <View style={styles.radioOuter}>
+                                    {form.ageLimit === option && <View style={styles.radioInnerBlue} />}
+                                </View>
+                                <Text style={styles.radioLabel}>
+                                    {option === 'none' ? 'No limit' : option === '18+' ? '18+' : 'For children only'}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                        {form.ageLimit === 'children' && (
+                            <TextInput
+                                style={[styles.input, { width: 120, marginTop: 8 }]}
+                                placeholder="Max age"
+                                keyboardType="numeric"
+                                value={form.maxChildAge}
+                                onChangeText={text => setForm({ ...form, maxChildAge: text })}
+                            />
+                        )}
+                    </View>
+
+                    <View style={styles.section}>
+                        <Text style={styles.sectionLabel}>Other</Text>
+                        <TouchableOpacity
+                            onPress={() => setForm({ ...form, medicalRequired: !form.medicalRequired })}
+                            style={styles.radioRowTight}
+                        >
+                            <View style={styles.radioOuter}>
+                                {form.medicalRequired && <View style={styles.radioInnerBlue} />}
+                            </View>
+                            <Text style={styles.radioLabel}>Requires medical certificate</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            onPress={() => setForm({ ...form, teamEvent: !form.teamEvent })}
+                            style={styles.radioRowTight}
+                        >
+                            <View style={styles.radioOuter}>
+                                {form.teamEvent && <View style={styles.radioInnerBlue} />}
+                            </View>
+                            <Text style={styles.radioLabel}>Team event</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.section}>
+                        <Text style={styles.sectionLabel}>Gender restriction</Text>
+                        {['any', 'male', 'female'].map(option => (
+                            <TouchableOpacity
+                                key={option}
+                                onPress={() => setForm({ ...form, genderRestriction: option })}
+                                style={styles.radioRowTight}
+                            >
+                                <View style={styles.radioOuter}>
+                                    {form.genderRestriction === option && <View style={styles.radioInnerBlue} />}
+                                </View>
+                                <Text style={styles.radioLabel}>
+                                    {option === 'any' ? 'Any' : option.charAt(0).toUpperCase() + option.slice(1)}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+
+                    <TextInput
+                        style={[styles.descriptionInput]}
+                        value={form.description}
+                        onChangeText={text => setForm({ ...form, description: text })}
+                        placeholder="Event description"
+                        placeholderTextColor="#aaa"
+                        multiline
+                        numberOfLines={4}
+                    />
+                </View>
             </ScrollView>
             <View style={[UNIFIED_STYLES.buttonRow, { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: '#f5f5f5' }]}>
                 <TouchableOpacity
@@ -337,47 +351,114 @@ export default function NewEventForm({ navigation }) {
                     <Text style={primaryButtonText}>Accept</Text>
                 </TouchableOpacity>
             </View>
-        </View>
         </KeyboardAvoidingView>
     );
 }
 
 
 const styles = StyleSheet.create({
-    logoBox: {
-        width: 150,
-        height: 150,
-        borderWidth: 1,
-        borderColor: '#bbb',
-        backgroundColor: '#fafafa',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 18,
-        marginTop: 2,
+    scrollView: {
+        flex: 1,
+        backgroundColor: '#f5f5f5',
+    },
+    scrollContent: {
+        paddingVertical: 20,
+        paddingHorizontal: 30,
+    },
+    container: {
+        flex: 1,
+        width: '95%',
+        maxWidth: 900,
+        alignSelf: 'center',
+    },
+    title: {
+        fontSize: 28,
+        fontWeight: '600',
+        marginBottom: 20,
+    },
+    field: {
+        marginBottom: 15,
+    },
+    label: {
+        fontSize: 16,
+        marginBottom: 6,
+    },
+    input: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        backgroundColor: '#fff',
+        borderWidth: 2,
+        borderColor: '#b0b0b0',
         borderRadius: 0,
+        padding: 6,
+        marginBottom: 4,
+        fontFamily: 'System',
+        fontSize: 15,
+        color: '#222',
+        shadowColor: '#fff',
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 1,
+        shadowRadius: 0,
+    },
+    inputText: {
+        fontSize: 16,
+        fontFamily: FONT,
+    },
+    centerAligned: {
+        alignItems: 'center',
+        marginVertical: 10,
+    },
+    logoBox: {
+        borderWidth: 1,
+        borderColor: '#aaa',
+        borderRadius: 3,
+        paddingVertical: 12,
+        paddingHorizontal: 20,
     },
     logoText: {
+        fontSize: 16,
         fontFamily: FONT,
-        fontSize: 20,
-        color: '#888',
-        textAlign: 'center',
+    },
+    section: {
+        marginVertical: 12,
+        padding: 8,
+    },
+    sectionLabel: {
+        fontFamily: FONT,
+        fontWeight: 'bold',
+        fontSize: 16,
+        color: '#1c1c1c',
+        marginBottom: 8,
+        borderBottomWidth: 2,
+        borderBottomColor: 'rgb(28,28,28)',
+        paddingBottom: 2,
+    },
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    column: {
+        flex: 1,
+        marginRight: 12,
     },
     webInputDate: {
-        width: 300,
-        height: 44,
-        borderWidth: 1,
-        borderColor: '#bbb',
-        backgroundColor: '#fff',
-        fontFamily: FONT,
         fontSize: 16,
-        color: '#222',
-        marginBottom: 14,
-        borderRadius: 0,
-        paddingLeft: 15,
-        paddingRight: 15,
+        padding: 6,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 3,
+    },
+    warning: {
+        color: 'red',
+        marginTop: 5,
+    },
+    radioRowTight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 6,
+        gap: 4,
     },
     radioOuter: {
-        marginTop: 20,
         width: 20,
         height: 20,
         borderRadius: 10,
@@ -399,22 +480,23 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: '#1c1c1c',
     },
-    radioRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 4,
-    },
     radioLabel: {
-        fontFamily: FONT,
-        fontSize: 18,
-        color: '#222',
-        marginTop: 20
+        fontSize: 16,
     },
-    sectionLabel: {
-        fontWeight: 'bold',
-        fontFamily: FONT,
-        fontSize: 18,
+    descriptionInput: {
+        marginTop: 24,
+        height: 150,
+        maxHeight: 150,
+        textAlignVertical: 'top',
+        marginBottom: 100,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        backgroundColor: '#fff',
+        borderWidth: 2,
+        borderColor: '#b0b0b0',
+        borderRadius: 0,
+        fontFamily: 'System',
+        fontSize: 15,
         color: '#222',
-        marginBottom: 6,
-    },
+    }
 });
