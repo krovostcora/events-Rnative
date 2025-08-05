@@ -1,6 +1,6 @@
 // app/screens/RaceDetails.jsx
 import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Modal } from 'react-native';
+import { Platform, View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Modal, Alert } from 'react-native';
 import {
     primaryButton, primaryButtonText,
     secondaryButton, secondaryButtonText,
@@ -10,10 +10,8 @@ import {
     cancelButton, cancelButtonText,
     optionsButton, optionsButtonText
 } from "../../components/buttons_styles";
-
 import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
-
 
 export default function RaceDetails({ navigation }) {
     const [running, setRunning] = useState(false);
@@ -44,12 +42,10 @@ export default function RaceDetails({ navigation }) {
         }
         const sorted = [...entries].sort((a, b) => {
             if (column === 'id') {
-                // Remove '#' and compare as numbers
                 const aId = parseInt(a.id.replace('#', ''), 10);
                 const bId = parseInt(b.id.replace('#', ''), 10);
                 return order === 'asc' ? aId - bId : bId - aId;
             } else if (column === 'time') {
-                // Compare time strings as HH:MM:SS
                 return order === 'asc'
                     ? a.time.localeCompare(b.time)
                     : b.time.localeCompare(a.time);
@@ -68,13 +64,41 @@ export default function RaceDetails({ navigation }) {
 
     const handlePrint = async () => {
         let htmlContent = `
-        <h1>Race Results</h1>
-        <table border="1" cellspacing="0" cellpadding="5">
-            <tr><th>ID</th><th>Time</th></tr>
-            ${entries.map(e => `<tr><td>${e.id}</td><td>${e.time}</td></tr>`).join('')}
-        </table>
-    `;
-
+            <html>
+            <head>
+            <style>
+            @page { margin: 0; }
+            body { margin: 0; padding: 0; }
+            table {
+                border: 1px solid #000;
+                border-collapse: collapse;
+                font-size: 16px;
+                width: auto;
+                margin: 0 auto;
+            }
+            th, td {
+                border: 1px solid #000;
+                padding: 5px 10px;
+                text-align: center;
+            }
+            </style>
+            </head>
+            <body>
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Time</th>
+                </tr>
+                ${entries.map(e => `
+                <tr>
+                    <td>${e.id}</td>
+                    <td>${e.time}</td>
+                </tr>
+                `).join('')}
+            </table>
+            </body>
+            </html>
+        `;
         try {
             const { uri } = await Print.printToFileAsync({ html: htmlContent });
             await shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
@@ -83,6 +107,44 @@ export default function RaceDetails({ navigation }) {
         }
     };
 
+    const handlePrintWeb = () => {
+        const popup = window.open('', '_blank', 'width=600,height=600');
+        popup.document.write(`
+            <html>
+            <head>
+            <style>
+            @page { margin: 0; }
+            body { margin: 0; padding: 0; font-family: monospace; }
+            table {
+                border: 1px solid #000;
+                border-collapse: collapse;
+                font-size: 12px;
+                width: 200px;
+                margin: 20px auto;
+            }
+            th, td {
+                border: 1px solid #000;
+                padding: 4px 6px;
+                text-align: center;
+            }
+            </style>
+            </head>
+            <body>
+            <table>
+                <tr><th>ID</th><th>Time</th></tr>
+                ${entries.map(e => `<tr><td>${e.id}</td><td>${e.time}</td></tr>`).join('')}
+            </table>
+            <script>
+                window.onload = function() {
+                    window.print();
+                    window.onafterprint = function() { window.close(); };
+                };
+            </script>
+            </body>
+            </html>
+        `);
+        popup.document.close();
+    };
 
     const toggleTimer = () => {
         if (running) {
@@ -129,16 +191,16 @@ export default function RaceDetails({ navigation }) {
                     />
                     <View style={[styles.cellOptions, { flex: 2 }]}>
                         <TouchableOpacity
-                            style={styles.saveButton}
+                            style={saveButton}
                             onPress={handleSaveEdit}
                         >
-                            <Text style={styles.saveButtonText}>Save</Text>
+                            <Text style={saveButtonText}>Save</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={styles.cancelButton}
+                            style={cancelButton}
                             onPress={() => setEditIndex(null)}
                         >
-                            <Text style={styles.cancelButtonText}>Cancel</Text>
+                            <Text style={cancelButtonText}>Cancel</Text>
                         </TouchableOpacity>
                     </View>
                 </>
@@ -148,14 +210,14 @@ export default function RaceDetails({ navigation }) {
                     <Text style={[styles.cellTime, { flex: 1.1 }]}>{item.time}</Text>
                     <View style={[styles.cellOptions, { flex: 2 }]}>
                         <TouchableOpacity
-                            style={styles.editButton}
+                            style={editButton}
                             onPress={() => handleEdit(index)}>
-                            <Text style={styles.editButtonText}>Edit</Text>
+                            <Text style={editButtonText}>Edit</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={styles.deleteButton}
+                            style={deleteButton}
                             onPress={() => handleDelete(index)}>
-                            <Text style={styles.deleteButtonText}>Delete</Text>
+                            <Text style={deleteButtonText}>Delete</Text>
                         </TouchableOpacity>
                     </View>
                 </>
@@ -169,6 +231,7 @@ export default function RaceDetails({ navigation }) {
 
             <FlatList
                 data={entries}
+                renderItem={renderRow}
                 keyExtractor={(item, index) => index.toString()}
                 ListHeaderComponent={
                     <View style={styles.headerRow}>
@@ -195,45 +258,6 @@ export default function RaceDetails({ navigation }) {
                         </View>
                     </View>
                 }
-                renderItem={({ item, index }) => (
-                    <View style={styles.row}>
-                        <Text style={[styles.cellId, { flex: 0.6 }]}>{item.id}</Text>
-                        <Text style={[styles.cellTime, { flex: 1.1 }]}>{item.time}</Text>
-                        <View style={[styles.cellOptions, { flex: 2 }]}>
-                            {editIndex === index ? (
-                                <>
-                                    <TouchableOpacity
-                                        style={saveButton}
-                                        onPress={handleSaveEdit}
-                                    >
-                                        <Text style={saveButtonText}>Save</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={cancelButton}
-                                        onPress={() => setEditIndex(null)}
-                                    >
-                                        <Text style={cancelButtonText}>Cancel</Text>
-                                    </TouchableOpacity>
-                                </>
-                            ) : (
-                                <>
-                                    <TouchableOpacity
-                                        style={editButton}
-                                        onPress={() => handleEdit(index)}
-                                    >
-                                        <Text style={editButtonText}>Edit</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={deleteButton}
-                                        onPress={() => handleDelete(index)}
-                                    >
-                                        <Text style={deleteButtonText}>Delete</Text>
-                                    </TouchableOpacity>
-                                </>
-                            )}
-                        </View>
-                    </View>
-                )}
             />
 
             <TouchableOpacity style={primaryButton} onPress={toggleTimer}>
@@ -241,7 +265,11 @@ export default function RaceDetails({ navigation }) {
             </TouchableOpacity>
 
             <View style={styles.controls}>
-                <TouchableOpacity style={optionsButton} onPress={handlePrint}>
+                <TouchableOpacity
+                    style={optionsButton}
+                    onPress={() => {
+                        Platform.OS === 'web' ? handlePrintWeb() : handlePrint();
+                    }}>
                     <Text style={optionsButtonText}>Print</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -255,7 +283,7 @@ export default function RaceDetails({ navigation }) {
                 </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={secondaryButton} onPress={() => navigation.goBack()}>
+            <TouchableOpacity style={[secondaryButton, {marginBottom: 20}]} onPress={() => navigation.goBack()}>
                 <Text style={secondaryButtonText}>Back</Text>
             </TouchableOpacity>
         </View>
@@ -265,8 +293,10 @@ export default function RaceDetails({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#eee',
-        padding: 12,
+        width: '95%',
+        maxWidth: 900,
+        alignSelf: 'center',
+        marginTop: 16,
     },
     timerDisplay: {
         fontSize: 24,
@@ -315,8 +345,8 @@ const styles = StyleSheet.create({
     },
     cellTime: {
         flex: 1,
-        paddingVertical: 10,
         textAlign: 'center',
+        paddingVertical: 10,
         borderRightWidth: 1,
         borderColor: '#ccc',
         fontSize: 16,
@@ -338,5 +368,3 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
 });
-
-
