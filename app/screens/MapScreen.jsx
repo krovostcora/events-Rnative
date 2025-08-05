@@ -41,8 +41,8 @@ export default function MapScreen({ route, navigation }) {
 
     const handleMessage = (event) => {
         const coords = event.nativeEvent.data;
-        if (onSelect) onSelect(coords);  // викликає функцію з попереднього екрана
-        navigation.goBack();             // повертаємось назад
+        if (onSelect) onSelect(coords);
+        navigation.goBack();
     };
 
     return (

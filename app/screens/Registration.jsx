@@ -18,7 +18,7 @@ import {
 import { UNIFIED_STYLES } from '../../components/constants';
 import { validateParticipant } from '../../utils/validateParticipant';
 
-const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
+const FONT = Platform.OS === 'ios' ? 'System' : 'monospace';
 
 function GenderRadio({ value, onChange }) {
     const options = [

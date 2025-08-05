@@ -14,7 +14,7 @@ import {
 import { UNIFIED_STYLES } from '../../components/constants';
 import { validateParticipant } from '../../utils/validateParticipant';
 
-const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
+const FONT = Platform.OS === 'ios' ? 'System' : 'monospace';
 const roles = ['spectator', 'runner'];
 
 export default function ManageRegistrations({ route, navigation }) {
@@ -26,6 +26,7 @@ export default function ManageRegistrations({ route, navigation }) {
     const [editParticipant, setEditParticipant] = useState({});
     const [validationErrors, setValidationErrors] = useState({});
     const [eventRestrictions, setEventRestrictions] = useState(null);
+    const [expandedCards, setExpandedCards] = useState({}); // tracks which cards are expanded
 
     useEffect(() => {
         if (!folder) return;
@@ -93,8 +94,16 @@ export default function ManageRegistrations({ route, navigation }) {
         return <View style={styles.center}><Text>No registrations yet.</Text></View>;
     }
 
+    const toggleCard = (idx) => {
+        setExpandedCards(prev => ({
+            ...prev,
+            [idx]: !prev[idx],
+        }));
+    };
+
     return (
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1 }} style={UNIFIED_STYLES.container2}>
+            <Text style={UNIFIED_STYLES.title}>Participants</Text>
             <ScrollView contentContainerStyle={styles.list}>
                 {participants.map((item, idx) =>
                     editIndex === idx ? (
@@ -168,7 +177,14 @@ export default function ManageRegistrations({ route, navigation }) {
                                                 ]}
                                                 onPress={() => setEditParticipant({ ...editParticipant, raceRole: role })}
                                             >
-                                                <Text style={styles.roleText}>{role}</Text>
+                                                <Text
+                                                    style={[
+                                                        styles.roleText,
+                                                        editParticipant.raceRole !== role && { color: '#222' }
+                                                    ]}
+                                                >
+                                                    {role}
+                                                </Text>
                                             </TouchableOpacity>
                                         ))}
                                     </View>
@@ -213,139 +229,124 @@ export default function ManageRegistrations({ route, navigation }) {
                             </View>
                         </View>
                     ) : (
-                        <View style={styles.card} key={idx}>
-                            <Text style={styles.label}>Name</Text>
-                            <Text style={styles.value}>{item.name}</Text>
-                            <Text style={styles.label}>Surname</Text>
-                            <Text style={styles.value}>{item.surname}</Text>
-                            <Text style={styles.label}>Age</Text>
-                            <Text style={styles.value}>{item.age}</Text>
-                            <Text style={styles.label}>Gender</Text>
-                            <Text style={styles.value}>{item.gender}</Text>
-                            <Text style={styles.label}>Email</Text>
-                            <Text style={styles.value}>{item.email}</Text>
-                            <Text style={styles.label}>Phone</Text>
-                            <Text style={styles.value}>{item.phone}</Text>
-                            {eventRestrictions?.isRace && item.raceRole && (
+                        <TouchableOpacity
+                            key={idx}
+                            style={styles.card}
+                            onPress={() => toggleCard(idx)}
+                            activeOpacity={0.8}
+                        >
+                            {expandedCards[idx] ? (
                                 <>
-                                    <Text style={styles.label}>Race Role</Text>
-                                    <Text style={styles.value}>{item.raceRole}</Text>
+                                    <Text style={styles.label}>Name</Text>
+                                    <Text style={styles.value}>{item.name}</Text>
+                                    <Text style={styles.label}>Surname</Text>
+                                    <Text style={styles.value}>{item.surname}</Text>
+                                    <Text style={styles.label}>Age</Text>
+                                    <Text style={styles.value}>{item.age}</Text>
+                                    <Text style={styles.label}>Gender</Text>
+                                    <Text style={styles.value}>{item.gender}</Text>
+                                    <Text style={styles.label}>Email</Text>
+                                    <Text style={styles.value}>{item.email}</Text>
+                                    <Text style={styles.label}>Phone</Text>
+                                    <Text style={styles.value}>{item.phone}</Text>
+                                    {eventRestrictions?.isRace && item.raceRole && (
+                                        <>
+                                            <Text style={styles.label}>Race Role</Text>
+                                            <Text style={styles.value}>{item.raceRole}</Text>
+                                        </>
+                                    )}
+                                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10 }}>
+                                        <TouchableOpacity
+                                            style={editButton}
+                                            onPress={() => {
+                                                setEditIndex(idx);
+                                                setEditParticipant({
+                                                    ...item,
+                                                    raceRole: eventRestrictions?.isRace ? (item.raceRole || '') : undefined
+                                                });
+                                            }}
+                                        >
+                                            <Text style={editButtonText}>Edit</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={deleteButton}
+                                            onPress={() => handleDeleteParticipant(item.id)}
+                                        >
+                                            <Text style={deleteButtonText}>Delete</Text>
+                                        </TouchableOpacity>
+                                    </View>
                                 </>
+                            ) : (
+                                <Text style={styles.summary}>{item.name} {item.surname}</Text>
                             )}
-                            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10 }}>
-                                <TouchableOpacity
-                                    style={editButton}
-                                    onPress={() => {
-                                        setEditIndex(idx);
-                                        setEditParticipant({
-                                            ...item,
-                                            raceRole: eventRestrictions?.isRace ? (item.raceRole || '') : undefined
-                                        });
-                                    }}
-                                >
-                                    <Text style={editButtonText}>Edit</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={deleteButton}
-                                    onPress={() => handleDeleteParticipant(item.id)}
-                                >
-                                    <Text style={deleteButtonText}>Delete</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
+                        </TouchableOpacity>
                     )
                 )}
             </ScrollView>
-
-            <View style={UNIFIED_STYLES.buttonRow}>
-                <TouchableOpacity
-                    style={secondaryButton}
-                    onPress={() => navigation.navigate('EventSelector')}
-                >
-                    <Text style={secondaryButtonText}>Back</Text>
-                </TouchableOpacity>
-            </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
+    list: {
+        padding: 10,
+        paddingBottom: 40,
+    },
+    card: {
+        borderWidth: 1,
+        borderColor: '#444',
+        borderRadius: 4,
+        padding: 8,
+        marginBottom: 10,
+        backgroundColor: '#f8f8f8'
+    },
+    summary: {
+        fontFamily: FONT,
+        fontSize: 16,
+        paddingVertical: 10,
+    },
+    label: {
+        fontWeight: 'bold',
+        marginTop: 6,
+        fontFamily: FONT,
+    },
+    value: {
+        fontFamily: FONT,
+        fontSize: 15,
+        marginBottom: 4,
+    },
+    actions: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+    },
+    roleRow: {
+        flexDirection: 'row',
+        marginTop: 6,
+        marginBottom: 4,
+    },
+    roleButton: {
+        borderWidth: 1,
+        borderColor: '#555',
+        borderRadius: 3,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        marginRight: 8,
+    },
+    selectedRole: {
+        backgroundColor: '#555',
+    },
+    roleText: {
+        color: '#fff',
+    },
+    error: {
+        color: 'red',
+        fontSize: 13,
+        marginTop: 2,
+    },
     center: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#e0e0e0',
-    },
-    error: {
-        color: '#b22222',
-        fontSize: 16,
-        fontFamily: 'System',
-        borderWidth: 1,
-        borderColor: '#808080',
-        backgroundColor: '#fff8f8',
-        padding: 8,
-        margin: 8,
-    },
-    list: {
-        padding: 16,
-        backgroundColor: '#e0e0e0',
-    },
-    card: {
-        backgroundColor: '#f0f0f0',
-        borderRadius: 0,
-        padding: 16,
-        marginBottom: 16,
-        elevation: 2,
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        minWidth: 0,
-    },
-    label: {
-        color: '#003399',
-        fontSize: 13,
-        marginTop: 4,
-        fontFamily: 'System',
-        fontWeight: 'bold',
-        textShadowColor: '#fff',
-        textShadowOffset: { width: 1, height: 1 },
-        textShadowRadius: 0,
-    },
-    value: {
-        color: '#222',
-        fontSize: 16,
-        fontWeight: '500',
-        marginBottom: 2,
-        fontFamily: 'System',
-    },
-    actions: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        marginTop: 8,
-        gap: 12,
-    },
-    roleRow: {
-        flexDirection: 'row',
-        marginTop: 4,
-        marginBottom: 4,
-    },
-    roleButton: {
-        backgroundColor: '#e0e0e0',
-        borderWidth: 2,
-        borderColor: '#b0b0b0',
-        borderRadius: 0,
-        paddingVertical: 4,
-        paddingHorizontal: 12,
-        marginRight: 8,
-        minWidth: 60,
-        alignItems: 'center',
-    },
-    selectedRole: {
-        backgroundColor: '#c0d8ff',
-        borderColor: '#003399',
-    },
-    roleText: {
-        color: '#003399',
-        fontWeight: 'bold',
-        fontFamily: 'System',
-    },
+    }
 });

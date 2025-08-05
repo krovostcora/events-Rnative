@@ -20,7 +20,7 @@ import {
 } from '../../components/buttons_styles';
 import { UNIFIED_STYLES } from '../../components/constants';
 
-const FONT = Platform.OS === 'ios' ? 'Menlo' : 'monospace';
+const FONT = Platform.OS === 'ios' ? 'System' : 'monospace';
 
 export default function DateSearch({ navigation }) {
     const [mode, setMode] = useState('single');
