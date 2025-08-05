@@ -24,8 +24,6 @@ const FONT = Platform.OS === 'ios' ? 'System' : 'monospace';
 
 export default function DateSearch({ navigation }) {
     const [mode, setMode] = useState('single');
-    const [showStart, setShowStart] = useState(false);
-    const [showEnd, setShowEnd] = useState(false);
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
     const [allEvents, setAllEvents] = useState([]);
@@ -106,11 +104,6 @@ export default function DateSearch({ navigation }) {
         filterEvents();
     };
 
-    const handleCancel = () => {
-        setEvents([]);
-        setError(null);
-    };
-
     return (
         <View style={UNIFIED_STYLES.container}>
             <Text style={UNIFIED_STYLES.title}>Search Events by Date</Text>
@@ -143,7 +136,7 @@ export default function DateSearch({ navigation }) {
                         onPress={() =>
                             setShowDatePicker(prev => ({
                                 mode: 'start',
-                                visible: prev.visible && prev.mode === 'start' ? false : true
+                                visible: !(prev.visible && prev.mode === 'start')
                             }))
                         }
                         style={UNIFIED_STYLES.input}
@@ -180,7 +173,7 @@ export default function DateSearch({ navigation }) {
                             onPress={() =>
                                 setShowDatePicker(prev => ({
                                     mode: 'end',
-                                    visible: prev.visible && prev.mode === 'end' ? false : true
+                                    visible: !(prev.visible && prev.mode === 'end')
                                 }))
                             }
                             style={UNIFIED_STYLES.input}

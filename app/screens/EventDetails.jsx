@@ -162,7 +162,7 @@ export default function EventDetails({ route, navigation }) {
                 )}
 
                 <TouchableOpacity
-                    style={[primaryButton, {marginBottom: 80}]}
+                    style={[primaryButton, {marginBottom: 80, marginTop: 20}]}
                     onPress={() =>
                         navigation.navigate('ManageRegistrations', {folder: getFolderName(event)})
                     }
@@ -232,14 +232,14 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     detailText: {
-        fontFamily: Platform.OS === 'ios' ? 'System' : 'monospace',
+        fontFamily: FONT,
         fontSize: 16,
         color: '#222',
         marginBottom: 10,
         justifyContent: 'flex-start',
     },
     linkText: {
-        fontFamily: Platform.OS === 'ios' ? 'System' : 'monospace',
+        fontFamily: FONT,
         fontSize: 16,
         color: '#003399',
         fontWeight: 'semibold',
@@ -249,10 +249,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#eee',
         width: '90%',
         padding: 16,
-        marginBottom: 24,
     },
     sectionLabel: {
-        fontFamily: Platform.OS === 'ios' ? 'System' : 'monospace',
+        fontFamily: FONT,
         textShadowColor: '#fff',
         textShadowOffset: { width: 1, height: 1 },
         textShadowRadius: 0,
@@ -265,7 +264,7 @@ const styles = StyleSheet.create({
         paddingBottom: 5,
     },
     moreDetailText: {
-        fontFamily: Platform.OS === 'ios' ? 'System' : 'monospace',
+        fontFamily: FONT,
         fontSize: 15,
         color: '#222',
         marginBottom: 20,

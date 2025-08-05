@@ -4,8 +4,6 @@ import {
     TouchableOpacity, ScrollView, Platform
 } from 'react-native';
 import {
-    primaryButton, primaryButtonText,
-    secondaryButton, secondaryButtonText,
     editButton, editButtonText,
     saveButton, saveButtonText,
     deleteButton, deleteButtonText,
@@ -17,7 +15,7 @@ import { validateParticipant } from '../../utils/validateParticipant';
 const FONT = Platform.OS === 'ios' ? 'System' : 'monospace';
 const roles = ['spectator', 'runner'];
 
-export default function ManageRegistrations({ route, navigation }) {
+export default function ManageRegistrations({ route }) {
     const folder = route.params?.folder;
     const [participants, setParticipants] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -102,7 +100,7 @@ export default function ManageRegistrations({ route, navigation }) {
     };
 
     return (
-        <View style={{ flex: 1 }} style={UNIFIED_STYLES.container2}>
+        <View style={[{ flex: 1 }, UNIFIED_STYLES.container2]}>
             <Text style={UNIFIED_STYLES.title}>Participants</Text>
             <ScrollView contentContainerStyle={styles.list}>
                 {participants.map((item, idx) =>
