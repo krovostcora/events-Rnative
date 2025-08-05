@@ -11,6 +11,14 @@ export const UNIFIED_STYLES = StyleSheet.create({
         // paddingRight: 30,
         paddingTop: 16,
     },
+
+    container2: {
+        flex: 1,
+        width: '95%',
+        maxWidth: 900,
+        alignSelf: 'center',
+        marginTop: 16,
+    },
     title: {
         fontFamily: Platform.OS === 'ios' ? 'System' : 'monospace',
         fontSize: 22,
