@@ -60,14 +60,14 @@ export const toggleButtonText = {
 
 // OPTIONS (grey)
 export const optionsButton = {
+    flexGrow: 1,
+    flexBasis: '40%',
+    maxWidth: '48%',
+    paddingVertical: 12,
+    alignItems: 'center',
     backgroundColor: '#8f8f8f',
     borderColor: '#666',
     borderWidth: 1,
-    paddingVertical: 16,
-    paddingHorizontal: 2,
-    minWidth: 90,
-    alignItems: 'center',
-    letterSpacing: 1,
 };
 
 export const optionsButtonText = {

@@ -15,7 +15,7 @@ import { shareAsync } from 'expo-sharing';
 import {UNIFIED_STYLES} from "../../components/constants";
 
 
-export default function RaceDetails({ navigation }) {
+export default function RaceDetails({ navigation, route }) {
     const [running, setRunning] = useState(false);
     const [time, setTime] = useState(0);
     const [entries, setEntries] = useState([]);
@@ -24,6 +24,7 @@ export default function RaceDetails({ navigation }) {
     const [editEntry, setEditEntry] = useState({ id: '', time: '' });
     const [sortBy, setSortBy] = useState(null);
     const [sortOrder, setSortOrder] = useState('asc');
+    const eventId = route.params?.eventId;
 
     const sortEntries = (column) => {
         let order = sortOrder;
@@ -85,7 +86,6 @@ export default function RaceDetails({ navigation }) {
             Alert.alert('Error', err.message);
         }
     };
-
 
     const toggleTimer = () => {
         if (running) {
@@ -157,8 +157,19 @@ export default function RaceDetails({ navigation }) {
         </View>
     );
 
-
-
+    const handleSaveResults = async () => {
+        try {
+            const response = await fetch(`https://events-server-eu5z.onrender.com/api/events/${eventId}/results`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ results: entries }),
+            });
+            if (!response.ok) throw new Error('Failed to save results');
+            Alert.alert('Success', 'Results saved!');
+        } catch (err) {
+            Alert.alert('Error', err.message);
+        }
+    };
 
     return (
         <View style={UNIFIED_STYLES.container2}>
@@ -198,31 +209,58 @@ export default function RaceDetails({ navigation }) {
                 }
             />
 
-            <TouchableOpacity style={primaryButton} onPress={toggleTimer}>
+            <TouchableOpacity
+                style={[primaryButton, { width: '80%', alignSelf: 'center' }]}
+                onPress={toggleTimer}
+            >
                 <Text style={primaryButtonText}>{running ? 'Stop' : 'Start'}</Text>
             </TouchableOpacity>
 
-            <View style={styles.controls}>
-                <TouchableOpacity style={optionsButton} onPress={handlePrint}>
+            <View style={[styles.controls, { flexWrap: 'nowrap', marginVertical: 10 }]}>
+
+                <TouchableOpacity
+                    style={[optionsButton, { flex: 1, maxWidth: '25%', paddingHorizontal: 12 }]}
+                    onPress={handleSaveResults}
+                >
+                    <Text style={optionsButtonText}>Save</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[optionsButton, {
+                        flex: 1,
+                        maxWidth: '40%',
+                        paddingHorizontal: 12,
+                    }]}
+                    onPress={handleStartNewRace}
+                >
+                    <Text style={optionsButtonText}>Start new race</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[optionsButton, {
+                        flex: 1,
+                        maxWidth: '25%',
+                        paddingHorizontal: 12,
+                    }]}
+                    onPress={handlePrint}
+                >
                     <Text style={optionsButtonText}>Print</Text>
                 </TouchableOpacity>
 
-
-            <TouchableOpacity
-                style={[optionsButton, { minWidth: 130, paddingHorizontal: 22 }]}
-                onPress={handleStartNewRace}
-            >
-                <Text style={optionsButtonText}>Start new race</Text>
-            </TouchableOpacity>
-                <TouchableOpacity style={optionsButton} onPress={() => {}}>
-                    <Text style={optionsButtonText}>Save</Text>
-                </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={[secondaryButton, { marginBottom: 20 }]}
+            <View style={[styles.controls, { marginBottom: 20, justifyContent: 'center' }]}>
+            <TouchableOpacity style={secondaryButton}
                               onPress={() => navigation.goBack()}>
                 <Text style={secondaryButtonText}>Back</Text>
             </TouchableOpacity>
+                <TouchableOpacity
+                    style={[primaryButton]}
+                    onPress={() => navigation.navigate('PreviousResults', { eventId })}
+                >
+                    <Text style={primaryButtonText}>Previous results</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 }
@@ -305,23 +343,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 12,
     },
-    editButton: {
-        color: '#007AFF',
-        fontSize: 15,
-    },
-    deleteButton: {
-        color: '#D00',
-        fontSize: 15,
-    },
-    cancelButton: {
-        color: '#999',
-        fontSize: 15,
-    },
     controls: {
-        marginVertical: 16,
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        gap: 12,
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        columnGap: 12,
+        rowGap: 12,
     },
     headerBold: {
         fontWeight: 'bold',
