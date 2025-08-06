@@ -1,6 +1,6 @@
 // app/screens/RaceDetails.jsx
 import React, { useState, useRef } from 'react';
-import { Platform, View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Modal, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react-native';
 import {
     primaryButton, primaryButtonText,
     secondaryButton, secondaryButtonText,
@@ -9,9 +9,11 @@ import {
     deleteButton, deleteButtonText,
     cancelButton, cancelButtonText,
     optionsButton, optionsButtonText
-} from "../../components/buttons_styles";
+} from '../../components/buttons_styles';
 import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
+import {UNIFIED_STYLES} from "../../components/constants";
+
 
 export default function RaceDetails({ navigation }) {
     const [running, setRunning] = useState(false);
@@ -22,13 +24,6 @@ export default function RaceDetails({ navigation }) {
     const [editEntry, setEditEntry] = useState({ id: '', time: '' });
     const [sortBy, setSortBy] = useState(null);
     const [sortOrder, setSortOrder] = useState('asc');
-
-    const handleStartNewRace = () => {
-        setEntries([]);
-        setTime(0);
-        setRunning(false);
-        setEditIndex(null);
-    };
 
     const sortEntries = (column) => {
         let order = sortOrder;
@@ -42,10 +37,12 @@ export default function RaceDetails({ navigation }) {
         }
         const sorted = [...entries].sort((a, b) => {
             if (column === 'id') {
+                // Remove '#' and compare as numbers
                 const aId = parseInt(a.id.replace('#', ''), 10);
                 const bId = parseInt(b.id.replace('#', ''), 10);
                 return order === 'asc' ? aId - bId : bId - aId;
             } else if (column === 'time') {
+                // Compare time strings as HH:MM:SS
                 return order === 'asc'
                     ? a.time.localeCompare(b.time)
                     : b.time.localeCompare(a.time);
@@ -53,6 +50,13 @@ export default function RaceDetails({ navigation }) {
             return 0;
         });
         setEntries(sorted);
+    };
+
+    const handleStartNewRace = () => {
+        setEntries([]);
+        setTime(0);
+        setRunning(false);
+        setEditIndex(null);
     };
 
     const formatTime = (t) => {
@@ -64,93 +68,30 @@ export default function RaceDetails({ navigation }) {
 
     const handlePrint = async () => {
         let htmlContent = `
-            <html>
-            <head>
-            <style>
-            @page { margin: 0; }
-            body { margin: 0; padding: 0; }
-            table {
-                border: 1px solid #000;
-                border-collapse: collapse;
-                font-size: 16px;
-                width: auto;
-                margin: 0 auto;
-            }
-            th, td {
-                border: 1px solid #000;
-                padding: 5px 10px;
-                text-align: center;
-            }
-            </style>
-            </head>
-            <body>
-            <table>
-                <tr>
-                    <th>ID</th>
-                    <th>Time</th>
-                </tr>
-                ${entries.map(e => `
-                <tr>
-                    <td>${e.id}</td>
-                    <td>${e.time}</td>
-                </tr>
-                `).join('')}
-            </table>
-            </body>
-            </html>
-        `;
+        <h1>Race Results</h1>
+        <table border="1" cellspacing="0" cellpadding="5">
+            <tr><th>ID</th><th>Time</th></tr>
+            ${entries.map(e => `<tr><td>${e.id}</td><td>${e.time}</td></tr>`).join('')}
+        </table>
+    `;
+
         try {
-            const { uri } = await Print.printToFileAsync({ html: htmlContent });
+            const { uri } = await Print.printToFileAsync({
+                html: htmlContent,
+                fileName: 'race results'
+            });
             await shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
         } catch (err) {
             Alert.alert('Error', err.message);
         }
     };
 
-    const handlePrintWeb = () => {
-        const popup = window.open('', '_blank', 'width=600,height=600');
-        popup.document.write(`
-            <html>
-            <head>
-            <style>
-            @page { margin: 0; }
-            body { margin: 0; padding: 0; font-family: monospace; }
-            table {
-                border: 1px solid #000;
-                border-collapse: collapse;
-                font-size: 12px;
-                width: 200px;
-                margin: 20px auto;
-            }
-            th, td {
-                border: 1px solid #000;
-                padding: 4px 6px;
-                text-align: center;
-            }
-            </style>
-            </head>
-            <body>
-            <table>
-                <tr><th>ID</th><th>Time</th></tr>
-                ${entries.map(e => `<tr><td>${e.id}</td><td>${e.time}</td></tr>`).join('')}
-            </table>
-            <script>
-                window.onload = function() {
-                    window.print();
-                    window.onafterprint = function() { window.close(); };
-                };
-            </script>
-            </body>
-            </html>
-        `);
-        popup.document.close();
-    };
 
     const toggleTimer = () => {
         if (running) {
             clearInterval(timerRef.current);
             const newId = entries.length + 1;
-            setEntries([...entries, { id: `#${newId}`, time: formatTime(time) }]);
+            setEntries([...entries, { id: `${newId}`, time: formatTime(time) }]);
         } else {
             setTime(0);
             timerRef.current = setInterval(() => setTime((t) => t + 1000), 1000);
@@ -182,7 +123,8 @@ export default function RaceDetails({ navigation }) {
                     <TextInput
                         value={editEntry.id}
                         style={[styles.cellId, { flex: 0.6 }]}
-                        onChangeText={(id) => setEditEntry({ ...editEntry, id })}
+                        keyboardType="numeric"
+                        onChangeText={(id) => setEditEntry({ ...editEntry, id: id.replace(/[^0-9]/g, '') })}
                     />
                     <TextInput
                         value={editEntry.time}
@@ -190,16 +132,10 @@ export default function RaceDetails({ navigation }) {
                         onChangeText={(time) => setEditEntry({ ...editEntry, time })}
                     />
                     <View style={[styles.cellOptions, { flex: 2 }]}>
-                        <TouchableOpacity
-                            style={saveButton}
-                            onPress={handleSaveEdit}
-                        >
+                        <TouchableOpacity style={saveButton} onPress={handleSaveEdit}>
                             <Text style={saveButtonText}>Save</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            style={cancelButton}
-                            onPress={() => setEditIndex(null)}
-                        >
+                        <TouchableOpacity style={cancelButton} onPress={() => setEditIndex(null)}>
                             <Text style={cancelButtonText}>Cancel</Text>
                         </TouchableOpacity>
                     </View>
@@ -209,14 +145,10 @@ export default function RaceDetails({ navigation }) {
                     <Text style={[styles.cellId, { flex: 0.6 }]}>{item.id}</Text>
                     <Text style={[styles.cellTime, { flex: 1.1 }]}>{item.time}</Text>
                     <View style={[styles.cellOptions, { flex: 2 }]}>
-                        <TouchableOpacity
-                            style={editButton}
-                            onPress={() => handleEdit(index)}>
+                        <TouchableOpacity style={editButton} onPress={() => handleEdit(index)}>
                             <Text style={editButtonText}>Edit</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            style={deleteButton}
-                            onPress={() => handleDelete(index)}>
+                        <TouchableOpacity style={deleteButton} onPress={() => handleDelete(index)}>
                             <Text style={deleteButtonText}>Delete</Text>
                         </TouchableOpacity>
                     </View>
@@ -225,8 +157,12 @@ export default function RaceDetails({ navigation }) {
         </View>
     );
 
+
+
+
     return (
-        <View style={styles.container}>
+        <View style={UNIFIED_STYLES.container2}>
+
             <Text style={styles.timerDisplay}>{formatTime(time)}</Text>
 
             <FlatList
@@ -244,6 +180,7 @@ export default function RaceDetails({ navigation }) {
                                 {' '}{sortBy === 'id' ? (sortOrder === 'asc' ? '↑' : '↓') : '↕'}
                             </Text>
                         </TouchableOpacity>
+
                         <TouchableOpacity
                             style={[styles.headerCell, { flex: 1.1 }]}
                             onPress={() => sortEntries('time')}
@@ -253,6 +190,7 @@ export default function RaceDetails({ navigation }) {
                                 {' '}{sortBy === 'time' ? (sortOrder === 'asc' ? '↑' : '↓') : '↕'}
                             </Text>
                         </TouchableOpacity>
+
                         <View style={[styles.headerCell, { flex: 2 }]}>
                             <Text style={styles.headerBold}>Options</Text>
                         </View>
@@ -265,25 +203,24 @@ export default function RaceDetails({ navigation }) {
             </TouchableOpacity>
 
             <View style={styles.controls}>
-                <TouchableOpacity
-                    style={optionsButton}
-                    onPress={() => {
-                        Platform.OS === 'web' ? handlePrintWeb() : handlePrint();
-                    }}>
+                <TouchableOpacity style={optionsButton} onPress={handlePrint}>
                     <Text style={optionsButtonText}>Print</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                    style={[optionsButton, { minWidth: 130, paddingHorizontal: 22 }]}
-                    onPress={handleStartNewRace}
-                >
-                    <Text style={optionsButtonText}>Start new race</Text>
-                </TouchableOpacity>
+
+
+            <TouchableOpacity
+                style={[optionsButton, { minWidth: 130, paddingHorizontal: 22 }]}
+                onPress={handleStartNewRace}
+            >
+                <Text style={optionsButtonText}>Start new race</Text>
+            </TouchableOpacity>
                 <TouchableOpacity style={optionsButton} onPress={() => {}}>
                     <Text style={optionsButtonText}>Save</Text>
                 </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={[secondaryButton, {marginBottom: 20}]} onPress={() => navigation.goBack()}>
+            <TouchableOpacity style={[secondaryButton, { marginBottom: 20 }]}
+                              onPress={() => navigation.goBack()}>
                 <Text style={secondaryButtonText}>Back</Text>
             </TouchableOpacity>
         </View>
@@ -293,10 +230,8 @@ export default function RaceDetails({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        width: '95%',
-        maxWidth: 900,
-        alignSelf: 'center',
-        marginTop: 16,
+        backgroundColor: '#eee',
+        padding: 12,
     },
     timerDisplay: {
         fontSize: 24,
@@ -304,8 +239,13 @@ const styles = StyleSheet.create({
         marginVertical: 16,
         backgroundColor: '#fff',
         padding: 10,
-        borderRadius: 6,
         elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        color: '#333',
+        fontWeight: 'bold',
     },
     headerRow: {
         flexDirection: 'row',
@@ -342,20 +282,40 @@ const styles = StyleSheet.create({
         borderRightWidth: 1,
         borderColor: '#ccc',
         fontSize: 16,
+        paddingHorizontal: 0,
+        borderWidth: 0,
+        backgroundColor: 'transparent',
+        minWidth: 0,
     },
     cellTime: {
         flex: 1,
-        textAlign: 'center',
         paddingVertical: 10,
+        textAlign: 'center',
         borderRightWidth: 1,
         borderColor: '#ccc',
         fontSize: 16,
+        paddingHorizontal: 0,
+        borderWidth: 0,
+        backgroundColor: 'transparent',
+        minWidth: 0,
     },
     cellOptions: {
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'center',
         gap: 12,
+    },
+    editButton: {
+        color: '#007AFF',
+        fontSize: 15,
+    },
+    deleteButton: {
+        color: '#D00',
+        fontSize: 15,
+    },
+    cancelButton: {
+        color: '#999',
+        fontSize: 15,
     },
     controls: {
         marginVertical: 16,
@@ -368,3 +328,5 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
 });
+
+
