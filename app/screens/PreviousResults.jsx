@@ -4,7 +4,9 @@ import {
     TouchableOpacity, ScrollView
 } from 'react-native';
 import { UNIFIED_STYLES } from '../../components/constants';
-import { secondaryButton, secondaryButtonText } from '../../components/buttons_styles';
+import { secondaryButton, secondaryButtonText,
+deleteButtonText, deleteButton
+} from '../../components/buttons_styles';
 
 export default function PreviousResults({ navigation, route }) {
     const eventId = route.params?.eventId;
@@ -38,6 +40,26 @@ export default function PreviousResults({ navigation, route }) {
         }));
     };
 
+    const handleDeleteGroup = async (groupKey) => {
+        try {
+            const group = groupedResults[groupKey];
+            const response = await fetch(
+                `https://events-server-eu5z.onrender.com/api/events/${eventId}/results/${group.date}`,
+                { method: 'DELETE' }
+            );
+
+            if (response.ok) {
+                setGroupedResults(prev => {
+                    const newData = { ...prev };
+                    delete newData[groupKey];
+                    return newData;
+                });
+            }
+        } catch (err) {
+            console.error('Error deleting group:', err);
+        }
+    };
+
     const formatDate = (dateStr) => {
         return `${dateStr.slice(0, 2)} ${dateStr.slice(2, 4)} ${dateStr.slice(4)}`;
     };
@@ -47,7 +69,8 @@ export default function PreviousResults({ navigation, route }) {
     }
 
     return (
-        <ScrollView contentContainerStyle={UNIFIED_STYLES.container2}>
+        <View style={UNIFIED_STYLES.container2}>
+        <ScrollView>
             <Text style={styles.title}>Previous Results</Text>
 
             {Object.entries(groupedResults).map(([date, group]) => (
@@ -68,17 +91,27 @@ export default function PreviousResults({ navigation, route }) {
                                 <View key={idx} style={styles.row}>
                                     <Text style={[styles.cell, { flex: 1 }]}>{item.id}</Text>
                                     <Text style={[styles.cell, { flex: 2 }]}>{item.time}</Text>
+
+
                                 </View>
                             ))}
+                            <TouchableOpacity
+                                style={deleteButton}
+                                onPress={() => handleDeleteGroup(date)}
+                            >
+                                <Text style={deleteButtonText}>Delete</Text>
+                            </TouchableOpacity>
+
                         </View>
                     )}
                 </View>
             ))}
-
-            <TouchableOpacity style={secondaryButton} onPress={() => navigation.goBack()}>
-                <Text style={secondaryButtonText}>Back</Text>
-            </TouchableOpacity>
         </ScrollView>
+    <TouchableOpacity style={[secondaryButton, {marginBottom : 20}]}
+                      onPress={() => navigation.goBack()}>
+        <Text style={secondaryButtonText}>Back</Text>
+    </TouchableOpacity>
+    </View>
     );
 }
 

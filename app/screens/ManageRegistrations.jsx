@@ -7,7 +7,8 @@ import {
     editButton, editButtonText,
     saveButton, saveButtonText,
     deleteButton, deleteButtonText,
-    cancelButton, cancelButtonText
+    cancelButton, cancelButtonText,
+    secondaryButton, secondaryButtonText
 } from "../../components/buttons_styles";
 import { UNIFIED_STYLES } from '../../components/constants';
 import { validateParticipant } from '../../utils/validateParticipant';
@@ -15,7 +16,7 @@ import { validateParticipant } from '../../utils/validateParticipant';
 const FONT = Platform.OS === 'ios' ? 'System' : 'monospace';
 const roles = ['spectator', 'runner'];
 
-export default function ManageRegistrations({ route }) {
+export default function ManageRegistrations({navigation, route }) {
     const folder = route.params?.folder;
     const [participants, setParticipants] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -281,6 +282,10 @@ export default function ManageRegistrations({ route }) {
                     )
                 )}
             </ScrollView>
+            <TouchableOpacity style={[secondaryButton, {marginBottom : 20}]}
+                              onPress={() => navigation.goBack()}>
+                <Text style={secondaryButtonText}>Back</Text>
+            </TouchableOpacity>
         </View>
     );
 }
