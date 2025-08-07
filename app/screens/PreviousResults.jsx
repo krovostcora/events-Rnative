@@ -4,9 +4,12 @@ import {
     TouchableOpacity, ScrollView
 } from 'react-native';
 import { UNIFIED_STYLES } from '../../components/constants';
-import { secondaryButton, secondaryButtonText,
-deleteButtonText, deleteButton
+import {
+    secondaryButton, secondaryButtonText,
+    deleteButtonText, deleteButton, editButtonText, editButton
 } from '../../components/buttons_styles';
+import * as Print from 'expo-print';
+import { shareAsync } from 'expo-sharing';
 
 export default function PreviousResults({ navigation, route }) {
     const eventId = route.params?.eventId;
@@ -32,6 +35,26 @@ export default function PreviousResults({ navigation, route }) {
             .catch(err => Alert.alert('Error', err.message))
             .finally(() => setLoading(false));
     }, [eventId]);
+
+    const handlePrintGroup = async (group) => {
+        let htmlContent = `
+        <h1>Race Results</h1>
+        <h2>Date: ${formatDate(group.date)}, Race ID: ${group.raceId}</h2>
+        <table border="1" cellspacing="0" cellpadding="5">
+            <tr><th>ID</th><th>Time</th></tr>
+            ${group.entries.map(e => `<tr><td>${e.id}</td><td>${e.time}</td></tr>`).join('')}
+        </table>
+    `;
+        try {
+            const { uri } = await Print.printToFileAsync({
+                html: htmlContent,
+                fileName: 'race_results'
+            });
+            await shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
+        } catch (err) {
+            Alert.alert('Error', err.message);
+        }
+    };
 
     const toggleDate = (date) => {
         setExpandedDates(prev => ({
@@ -95,12 +118,20 @@ export default function PreviousResults({ navigation, route }) {
 
                                 </View>
                             ))}
-                            <TouchableOpacity
-                                style={deleteButton}
-                                onPress={() => handleDeleteGroup(date)}
-                            >
-                                <Text style={deleteButtonText}>Delete</Text>
-                            </TouchableOpacity>
+                           <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12, marginVertical: 8 }}>
+                               <TouchableOpacity
+                                   style={editButton}
+                                   onPress={() => handlePrintGroup(group)}
+                               >
+                                   <Text style={editButtonText}>Print Results</Text>
+                               </TouchableOpacity>
+                               <TouchableOpacity
+                                   style={deleteButton}
+                                   onPress={() => handleDeleteGroup(date)}
+                               >
+                                   <Text style={deleteButtonText}>Delete</Text>
+                               </TouchableOpacity>
+                           </View>
 
                         </View>
                     )}
