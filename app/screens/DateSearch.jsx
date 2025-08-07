@@ -239,12 +239,12 @@ export default function DateSearch({ navigation }) {
                 )
             )}
 
-            <TouchableOpacity
-                style={[primaryButton, { marginTop: 32, marginBottom: 16, maxWidth: 600, alignSelf: 'center' }]}
-                onPress={handleSearch}
-            >
-                <Text style={primaryButtonText}>Search</Text>
-            </TouchableOpacity>
+            {/*<TouchableOpacity*/}
+            {/*    style={[primaryButton, { marginTop: 32, marginBottom: 16, maxWidth: 600, alignSelf: 'center' }]}*/}
+            {/*    onPress={handleSearch}*/}
+            {/*>*/}
+            {/*    <Text style={primaryButtonText}>Search</Text>*/}
+            {/*</TouchableOpacity>*/}
 
             <ScrollView style={styles.eventsList} contentContainerStyle={{ paddingBottom: 80 }}>
                 {loading && <ActivityIndicator size="large" color="#007AFF" />}

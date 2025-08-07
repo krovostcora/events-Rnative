@@ -40,13 +40,15 @@ export default function EventSelector({ navigation }) {
         setDropdownTop(y + height);
     };
 
+    const isDesktop = Dimensions.get('window').width > 768;
+
     return (
         <View style={UNIFIED_STYLES.container}>
             <Text style={UNIFIED_STYLES.title}>Select event</Text>
 
             <View ref={dropdownRef} onLayout={onDropdownLayout}>
                 <TouchableOpacity
-                    style={styles.dropdown}
+                    style={[styles.dropdown, isDesktop && styles.dropdownDesktop]}
                     onPress={() => setDropdownOpen(prev => !prev)}
                     activeOpacity={0.7}
                 >
@@ -59,10 +61,20 @@ export default function EventSelector({ navigation }) {
             {dropdownOpen && (
                 <View style={[
                     styles.dropdownList,
-                    {
+                    isDesktop ? {
+                        position: 'absolute',
+                        top: dropdownTop,
+                        left: (Dimensions.get('window').width - 320) / 2,
+                        width: 320,
+                        maxHeight: 250,
+                        zIndex: 10,
+                    } : {
+                        // Для телефону залишаємо як було
                         position: 'absolute',
                         top: dropdownTop,
                         left: (Dimensions.get('window').width - 280) / 2,
+                        width: 280,
+                        maxHeight: 180,
                         zIndex: 10,
                     }
                 ]}>
@@ -73,7 +85,8 @@ export default function EventSelector({ navigation }) {
                             <TouchableOpacity
                                 style={[
                                     styles.item,
-                                    selectedEvent?.id === item.id && styles.selectedItem
+                                    selectedEvent?.id === item.id && styles.selectedItem,
+                                    isDesktop && { paddingVertical: 12, paddingHorizontal: 20 }
                                 ]}
                                 onPress={() => {
                                     setSelectedEvent(item);
@@ -147,6 +160,10 @@ const styles = StyleSheet.create({
         shadowOpacity: 1,
         shadowRadius: 0,
     },
+    dropdownDesktop: {
+        width: 320,
+        height: 45,
+    },
     dropdownText: {
         fontFamily: FONT,
         fontSize: 15,
@@ -154,11 +171,9 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     dropdownList: {
-        width: 280,
         borderWidth: 2,
         borderColor: '#b0b0b0',
         backgroundColor: '#f0f0f0',
-        maxHeight: 180,
         borderRadius: 0,
         shadowColor: '#fff',
         shadowOffset: { width: 1, height: 1 },

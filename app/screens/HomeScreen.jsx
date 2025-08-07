@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, BackHandler } from 'react-native';
 import {
     primaryButton,
     primaryButtonText,
@@ -37,7 +37,10 @@ export default function HomeScreen({ navigation }) {
             </View>
             {/* Buttons */}
             <View style={UNIFIED_STYLES.buttonRow}>
-                <TouchableOpacity style={secondaryButton}>
+                <TouchableOpacity
+                    style={secondaryButton}
+                    onPress={() => BackHandler.exitApp()}
+                >
                     <Text style={secondaryButtonText}>EXIT</Text>
                 </TouchableOpacity>
                 <TouchableOpacity

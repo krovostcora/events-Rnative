@@ -105,6 +105,11 @@ export default function RaceDetails({ navigation, route }) {
     };
 
     const handleSaveEdit = () => {
+        const valid = /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/.test(editEntry.time);
+        if (!valid) {
+            Alert.alert('Error', 'Time must be in HH:MM:SS format');
+            return;
+        }
         const updated = [...entries];
         updated[editIndex] = { ...editEntry };
         setEntries(updated);
@@ -178,6 +183,7 @@ export default function RaceDetails({ navigation, route }) {
 
             <FlatList
                 data={entries}
+                style={{ marginBottom: 20 }}
                 renderItem={renderRow}
                 keyExtractor={(item, index) => index.toString()}
                 ListHeaderComponent={
