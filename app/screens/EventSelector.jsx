@@ -69,7 +69,6 @@ export default function EventSelector({ navigation }) {
                         maxHeight: 250,
                         zIndex: 10,
                     } : {
-                        // Для телефону залишаємо як було
                         position: 'absolute',
                         top: dropdownTop,
                         left: (Dimensions.get('window').width - 280) / 2,

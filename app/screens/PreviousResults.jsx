@@ -10,6 +10,7 @@ import {
 } from '../../components/buttons_styles';
 import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
+import { formatRaceTime } from '../../utils/formatRaceTime';
 
 export default function PreviousResults({ navigation, route }) {
     const eventId = route.params?.eventId;
@@ -42,23 +43,13 @@ export default function PreviousResults({ navigation, route }) {
             .finally(() => setLoading(false));
     }, [eventId]);
 
-// Формат часу перегонів
-    const formatDuration = (entry) => {
-        if (!entry.startTime || !entry.finishTime) return '00:00:00';
-        const elapsed = Math.floor((entry.finishTime - entry.startTime)/1000);
-        const hrs = Math.floor(elapsed/3600);
-        const mins = Math.floor((elapsed % 3600)/60);
-        const secs = elapsed % 60;
-        return `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-    };
-
     const handlePrintGroup = async (group) => {
         let htmlContent = `
             <h1>Race Results</h1>
             <h2>Date: ${group.date}</h2>
             <table border="1" cellspacing="0" cellpadding="5">
                 <tr><th>ID</th><th>Time</th></tr>
-                ${group.entries.map(e => `<tr><td>${e.id}</td><td>${formatDuration(e)}</td></tr>`).join('')}
+                ${group.entries.map(e => `<tr><td>${e.id}</td><td>${formatRaceTime(e)}</td></tr>`).join('')}
             </table>
         `;
         try {
@@ -66,7 +57,7 @@ export default function PreviousResults({ navigation, route }) {
                 html: htmlContent,
                 fileName: 'race_results'
             });
-            await shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
+            await shareAsync(uri, { mimeType: 'application/pdf' });
         } catch (err) {
             Alert.alert('Error', err.message);
         }
@@ -125,7 +116,7 @@ export default function PreviousResults({ navigation, route }) {
                                 {entries.map((item, idx) => (
                                     <View key={idx} style={styles.row}>
                                         <Text style={[styles.cell, { flex: 1 }]}>{item.id}</Text>
-                                        <Text style={[styles.cell, { flex: 2 }]}>{formatDuration(item)}</Text>
+                                        <Text style={[styles.cell, { flex: 2 }]}>{formatRaceTime(item)}</Text>
                                     </View>
                                 ))}
 

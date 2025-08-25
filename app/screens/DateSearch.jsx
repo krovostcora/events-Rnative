@@ -10,8 +10,6 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {
-    primaryButton,
-    primaryButtonText,
     secondaryButton,
     secondaryButtonText,
     toggleButton,
@@ -53,7 +51,11 @@ export default function DateSearch({ navigation }) {
         setError(null);
         try {
             const response = await fetch('https://events-server-eu5z.onrender.com/api/events');
-            if (!response.ok) throw new Error('Failed to fetch events');
+            if (!response.ok) {
+                setError('Failed to fetch events');
+                setLoading(false);
+                return;
+            }
             const data = await response.json();
             const processed = data.map(event => ({
                 ...event,
@@ -99,10 +101,6 @@ export default function DateSearch({ navigation }) {
     useEffect(() => {
         filterEvents();
     }, [allEvents, mode, startDate, endDate]);
-
-    const handleSearch = () => {
-        filterEvents();
-    };
 
     return (
         <View style={[UNIFIED_STYLES.container2, { paddingHorizontal: 20 }]}>
@@ -238,13 +236,6 @@ export default function DateSearch({ navigation }) {
                     </View>
                 )
             )}
-
-            {/*<TouchableOpacity*/}
-            {/*    style={[primaryButton, { marginTop: 32, marginBottom: 16, maxWidth: 600, alignSelf: 'center' }]}*/}
-            {/*    onPress={handleSearch}*/}
-            {/*>*/}
-            {/*    <Text style={primaryButtonText}>Search</Text>*/}
-            {/*</TouchableOpacity>*/}
 
             <ScrollView style={styles.eventsList} contentContainerStyle={{ paddingBottom: 80 }}>
                 {loading && <ActivityIndicator size="large" color="#007AFF" />}

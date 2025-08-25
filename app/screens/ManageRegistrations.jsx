@@ -236,18 +236,19 @@ export default function ManageRegistrations({navigation, route }) {
                         >
                             {expandedCards[idx] ? (
                                 <>
-                                    <Text style={styles.label}>Name</Text>
-                                    <Text style={styles.value}>{item.name}</Text>
-                                    <Text style={styles.label}>Surname</Text>
-                                    <Text style={styles.value}>{item.surname}</Text>
-                                    <Text style={styles.label}>Age</Text>
-                                    <Text style={styles.value}>{item.age}</Text>
-                                    <Text style={styles.label}>Gender</Text>
-                                    <Text style={styles.value}>{item.gender}</Text>
-                                    <Text style={styles.label}>Email</Text>
-                                    <Text style={styles.value}>{item.email}</Text>
-                                    <Text style={styles.label}>Phone</Text>
-                                    <Text style={styles.value}>{item.phone}</Text>
+                                    {[
+                                      { label: 'Name', value: item.name },
+                                      { label: 'Surname', value: item.surname },
+                                      { label: 'Age', value: item.age },
+                                      { label: 'Gender', value: item.gender },
+                                      { label: 'Email', value: item.email },
+                                      { label: 'Phone', value: item.phone },
+                                    ].map(({ label, value }) => (
+                                      <React.Fragment key={label}>
+                                        <Text style={styles.label}>{label}</Text>
+                                        <Text style={styles.value}>{value}</Text>
+                                      </React.Fragment>
+                                    ))}
                                     {eventRestrictions?.isRace && item.raceRole && (
                                         <>
                                             <Text style={styles.label}>Race Role</Text>

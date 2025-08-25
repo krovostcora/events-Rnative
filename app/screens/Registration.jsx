@@ -26,6 +26,7 @@ function GenderRadio({ value, onChange }) {
         { label: 'F', value: 'female' },
         { label: 'Other', value: 'other' },
     ];
+
     return (
         <View style={styles.genderRow}>
             {options.map(opt => (
@@ -117,7 +118,9 @@ export default function Registration({ navigation, route }) {
             const event = route.params?.event;
 
             if (!event) {
-                throw new Error('Event data is missing');
+                Alert.alert('Error', 'Event data is missing');
+                setIsSubmitting(false);
+                return;
             }
 
             const folderName = `${event.date.replace(/-/g, '')}_${event.name.toLowerCase().replace(/\s+/g, '')}`;
@@ -149,7 +152,9 @@ export default function Registration({ navigation, route }) {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to register participant');
+                Alert.alert('Error', errorData.error || 'Failed to register participant');
+                setIsSubmitting(false);
+                return;
             }
 
             const data = await response.json();
