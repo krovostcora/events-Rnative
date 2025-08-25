@@ -3,14 +3,14 @@ import {
     View, Text, StyleSheet, ActivityIndicator, Alert,
     TouchableOpacity, ScrollView
 } from 'react-native';
-import { UNIFIED_STYLES } from '../../components/constants';
+import { UNIFIED_STYLES } from '../../../components/constants';
 import {
     secondaryButton, secondaryButtonText,
     deleteButtonText, deleteButton, editButtonText, editButton
-} from '../../components/buttons_styles';
+} from '../../../components/buttons_styles';
 import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
-import { formatRaceTime } from '../../utils/formatRaceTime';
+import { formatRaceTime } from '../../../utils/formatRaceTime';
 
 export default function PreviousResults({ navigation, route }) {
     const eventId = route.params?.eventId;

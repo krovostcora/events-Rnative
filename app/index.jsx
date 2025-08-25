@@ -3,14 +3,14 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeScreen';
 import EventSelector from './screens/EventSelector';
-import NewEventForm from './screens/NewEventForm';
+import NewEventForm from './screens/new_event/NewEventForm';
 import EventDetails from './screens/EventDetails';
-import Registration from './screens/Registration';
+import Registration from './screens/registrations/Registration';
 import DateSearch from "./screens/DateSearch";
-import MapScreen from "./screens/MapScreen";
-import RaceDetails from "./screens/RaceDetails";
-import ManageRegistrations from "./screens/ManageRegistrations";
-import PreviousResults from "./screens/PreviousResults";
+import MapScreen from "./screens/new_event/MapScreen";
+import RaceDetails from "./screens/race/RaceDetails";
+import ManageRegistrations from "./screens/registrations/ManageRegistrations";
+import PreviousResults from "./screens/race/PreviousResults";
 
 const Stack = createNativeStackNavigator();
 

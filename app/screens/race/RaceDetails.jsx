@@ -9,10 +9,10 @@ import {
     deleteButton, deleteButtonText,
     cancelButton, cancelButtonText,
     optionsButton, optionsButtonText
-} from '../../components/buttons_styles';
+} from '../../../components/buttons_styles';
 import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
-import {UNIFIED_STYLES} from "../../components/constants";
+import {UNIFIED_STYLES} from "../../../components/constants";
 
 
 export default function RaceDetails({ navigation, route }) {
