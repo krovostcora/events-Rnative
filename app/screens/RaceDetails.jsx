@@ -16,15 +16,16 @@ import {UNIFIED_STYLES} from "../../components/constants";
 
 
 export default function RaceDetails({ navigation, route }) {
-    const [running, setRunning] = useState(false);
-    const [time, setTime] = useState(0);
     const [entries, setEntries] = useState([]);
-    const timerRef = useRef(null);
     const [editIndex, setEditIndex] = useState(null);
     const [editEntry, setEditEntry] = useState({ id: '', time: '' });
     const [sortBy, setSortBy] = useState(null);
     const [sortOrder, setSortOrder] = useState('asc');
     const eventId = route.params?.eventId;
+    const [running, setRunning] = useState(false);
+    const [time, setTime] = useState(0);
+    const [startTime, setStartTime] = useState(null);
+    const timerRef = useRef(null);
 
     const sortEntries = (column) => {
         let order = sortOrder;
@@ -43,28 +44,11 @@ export default function RaceDetails({ navigation, route }) {
                 const bId = parseInt(b.id.replace('#', ''), 10);
                 return order === 'asc' ? aId - bId : bId - aId;
             } else if (column === 'time') {
-                // Compare time strings as HH:MM:SS
-                return order === 'asc'
-                    ? a.time.localeCompare(b.time)
-                    : b.time.localeCompare(a.time);
+                return order === 'asc' ? a.raceTime - b.raceTime : b.raceTime - a.raceTime;
             }
             return 0;
         });
         setEntries(sorted);
-    };
-
-    const handleStartNewRace = () => {
-        setEntries([]);
-        setTime(0);
-        setRunning(false);
-        setEditIndex(null);
-    };
-
-    const formatTime = (t) => {
-        const seconds = Math.floor(t / 1000) % 60;
-        const minutes = Math.floor(t / 60000) % 60;
-        const hours = Math.floor(t / 3600000);
-        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     };
 
     const handlePrint = async () => {
@@ -72,7 +56,9 @@ export default function RaceDetails({ navigation, route }) {
         <h1>Race Results</h1>
         <table border="1" cellspacing="0" cellpadding="5">
             <tr><th>ID</th><th>Time</th></tr>
-            ${entries.map(e => `<tr><td>${e.id}</td><td>${e.time}</td></tr>`).join('')}
+            ${entries.map(e => `<tr><td>${e.id}</td><td>${formatRaceTime(e)}</td></tr>`).join('')}
+
+
         </table>
     `;
 
@@ -87,38 +73,108 @@ export default function RaceDetails({ navigation, route }) {
         }
     };
 
-    const toggleTimer = () => {
-        if (running) {
-            clearInterval(timerRef.current);
-            const newId = entries.length + 1;
-            setEntries([...entries, { id: `${newId}`, time: formatTime(time) }]);
-        } else {
-            setTime(0);
-            timerRef.current = setInterval(() => setTime((t) => t + 1000), 1000);
-        }
-        setRunning(!running);
+    const formatTime = (seconds) => {
+        const hrs = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     };
 
     const handleEdit = (index) => {
+        const entry = entries[index];
+        const elapsed = entry.startTime && entry.finishTime
+            ? Math.floor((entry.finishTime - entry.startTime) / 1000)
+            : 0;
+        const hrs = Math.floor(elapsed / 3600);
+        const mins = Math.floor((elapsed % 3600) / 60);
+        const secs = elapsed % 60;
+
         setEditIndex(index);
-        setEditEntry(entries[index]);
+        setEditEntry({
+            id: entry.id,
+            // показуємо час у форматі HH:MM:SS
+            time: `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`,
+        });
     };
 
+
     const handleSaveEdit = () => {
-        const valid = /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/.test(editEntry.time);
+        const valid = /^([0-1]?\d|2[0-3]):([0-5]\d):([0-5]\d)$/.test(editEntry.time);
         if (!valid) {
             Alert.alert('Error', 'Time must be in HH:MM:SS format');
             return;
         }
+
+        // розбиваємо HH:MM:SS на секунди
+        const [hrs, mins, secs] = editEntry.time.split(':').map(Number);
+        const elapsedMs = (hrs * 3600 + mins * 60 + secs) * 1000;
+
         const updated = [...entries];
-        updated[editIndex] = { ...editEntry };
+        const oldEntry = updated[editIndex];
+
+        updated[editIndex] = {
+            ...oldEntry,
+            // зберігаємо startTime без змін
+            startTime: oldEntry.startTime || Date.now(),
+            // обчислюємо finishTime через startTime + відредагований час
+            finishTime: (oldEntry.startTime || Date.now()) + elapsedMs,
+            id: editEntry.id,
+        };
+
         setEntries(updated);
         setEditIndex(null);
     };
 
+
     const handleDelete = (index) => {
         const updated = entries.filter((_, i) => i !== index);
         setEntries(updated);
+    };
+
+    React.useEffect(() => {
+        if (running) {
+            timerRef.current = setInterval(() => {
+                setTime(prev => prev + 1);
+            }, 1000);
+        }
+        return () => clearInterval(timerRef.current);
+    }, [running]);
+
+
+// 2. Start new race: reset timer and entries, and start timer
+    // Start new race: зберігаємо абсолютний час старту
+    const handleStartNewRace = () => {
+        setEntries([]);
+        setEditIndex(null);
+        setTime(0);          // <-- reset timer display
+        const now = Date.now();
+        setStartTime(now);
+        setRunning(true);    // запускаємо секундомір
+    };
+
+
+// Finish гонки: зберігаємо finishTime для кожного
+    const handleFinish = () => {
+        if (!startTime) return;
+        const newId = entries.length + 1;
+        setEntries([
+            ...entries,
+            {
+                id: `${newId}`,
+                startTime: startTime,
+                finishTime: Date.now(),
+            }
+        ]);
+    };
+
+// Форматування часу гонки
+    const formatRaceTime = (entry) => {
+        if (!entry.startTime || !entry.finishTime) return '00:00:00';
+        const elapsed = Math.floor((entry.finishTime - entry.startTime) / 1000);
+        const hrs = Math.floor(elapsed / 3600);
+        const mins = Math.floor((elapsed % 3600) / 60);
+        const secs = elapsed % 60;
+        return `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
     };
 
     const renderRow = ({ item, index }) => (
@@ -134,7 +190,16 @@ export default function RaceDetails({ navigation, route }) {
                     <TextInput
                         value={editEntry.time}
                         style={[styles.cellTime, { flex: 1.1 }]}
-                        onChangeText={(time) => setEditEntry({ ...editEntry, time })}
+                        onChangeText={(text) => {
+                            // дозволяємо лише цифри, замінюємо двокрапки автоматично
+                            const cleaned = text.replace(/[^0-9]/g, '');
+                            let formatted = '';
+                            if (cleaned.length > 0) formatted += cleaned.slice(0,2);
+                            if (cleaned.length > 2) formatted += ':' + cleaned.slice(2,4);
+                            if (cleaned.length > 4) formatted += ':' + cleaned.slice(4,6);
+                            setEditEntry({ ...editEntry, time: formatted });
+                        }}
+                        keyboardType="numeric"
                     />
                     <View style={[styles.cellOptions, { flex: 2 }]}>
                         <TouchableOpacity style={saveButton} onPress={handleSaveEdit}>
@@ -148,7 +213,8 @@ export default function RaceDetails({ navigation, route }) {
             ) : (
                 <>
                     <Text style={[styles.cellId, { flex: 0.6 }]}>{item.id}</Text>
-                    <Text style={[styles.cellTime, { flex: 1.1 }]}>{item.time}</Text>
+                    <Text style={[styles.cellTime, { flex: 1.1 }]}>{formatRaceTime(item)}</Text>
+
                     <View style={[styles.cellOptions, { flex: 2 }]}>
                         <TouchableOpacity style={editButton} onPress={() => handleEdit(index)}>
                             <Text style={editButtonText}>Edit</Text>
@@ -215,13 +281,35 @@ export default function RaceDetails({ navigation, route }) {
                 }
             />
 
-            <TouchableOpacity
-                style={[primaryButton, { width: '80%', alignSelf: 'center' }]}
-                onPress={toggleTimer}
-            >
-                <Text style={primaryButtonText}>{running ? 'Stop' : 'Start'}</Text>
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 16, gap: 16 }}>
+                <TouchableOpacity
+                    style={[
+                        optionsButton,
+                        {
+                            width: 160,
+                            alignSelf: 'center',
+                            paddingVertical: 14,
+                        }
+                    ]}
+                    onPress={handleStartNewRace}
+                >
+                    <Text style={optionsButtonText}>Start new race</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[
+                        primaryButton,
+                        {
+                            width: 160,
+                            alignSelf: 'center',
+                            paddingVertical: 14,
+                        }
+                    ]}
+                    onPress={handleFinish}
+                >
+                    <Text style={primaryButtonText}>Finish</Text>
+                </TouchableOpacity>
 
+            </View>
             <View style={[styles.controls, { flexWrap: 'nowrap', marginVertical: 10 }]}>
 
                 <TouchableOpacity
@@ -229,17 +317,6 @@ export default function RaceDetails({ navigation, route }) {
                     onPress={handleSaveResults}
                 >
                     <Text style={optionsButtonText}>Save</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={[optionsButton, {
-                        flex: 1,
-                        maxWidth: '40%',
-                        paddingHorizontal: 12,
-                    }]}
-                    onPress={handleStartNewRace}
-                >
-                    <Text style={optionsButtonText}>Start new race</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
