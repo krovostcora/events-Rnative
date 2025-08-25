@@ -11,6 +11,7 @@ import MapScreen from "./screens/new_event/MapScreen";
 import RaceDetails from "./screens/race/RaceDetails";
 import ManageRegistrations from "./screens/registrations/ManageRegistrations";
 import PreviousResults from "./screens/race/PreviousResults";
+import EditEvent from "./screens/EditEvent";
 
 const Stack = createNativeStackNavigator();
 
@@ -27,6 +28,7 @@ export default function App() {
                 <Stack.Screen name="RaceControls" component={RaceDetails} />
                 <Stack.Screen name="ManageRegistrations" component={ManageRegistrations} />
                 <Stack.Screen name="PreviousResults" component={PreviousResults} />
+                <Stack.Screen name="EditEvent" component={EditEvent} />
             </Stack.Navigator>
     );
 }

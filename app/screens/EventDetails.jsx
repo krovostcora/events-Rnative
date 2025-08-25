@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, Text, TouchableOpacity, StyleSheet, Platform, Linking, Image } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, StyleSheet, Platform, Linking, Image, Alert } from 'react-native';
 import {
     primaryButton,
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
+    optionsButton, optionsButtonText,
 } from '../../components/buttons_styles';
 import { UNIFIED_STYLES } from '../../components/constants';
 
@@ -51,6 +52,45 @@ export default function EventDetails({ route, navigation }) {
             Linking.openURL(url);
         }
     };
+
+    const handleDelete = () => {
+        if (!event?.folder) {
+            Alert.alert('Error', 'Folder not found, cannot delete event');
+            return;
+        }
+
+        Alert.alert(
+            'Delete Event',
+            'Are you sure you want to delete this event?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            const res = await fetch(`https://events-server-eu5z.onrender.com/api/events/${event.folder}`, {
+                                method: 'DELETE',
+                            });
+                            if (!res.ok) {
+                                const text = await res.text();
+                                throw new Error(text || 'Failed to delete event');
+                            }
+                            navigation.navigate('EventSelector');
+                        } catch (err) {
+                            Alert.alert('Error', err.message);
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
+
+    const handleEdit = () => {
+        navigation.navigate('EditEvent', { event }); // You need to create this screen
+    };
+
 
     if (loading) {
         return (
@@ -170,6 +210,21 @@ export default function EventDetails({ route, navigation }) {
                     <Text style={primaryButtonText}>Manage registrations</Text>
                 </TouchableOpacity>
             </ScrollView>
+
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 20, marginBottom: -45 }}>
+                <TouchableOpacity
+                    style={[optionsButton, { marginRight: 12 }]}
+                    onPress={handleEdit}
+                >
+                    <Text style={optionsButtonText}>Edit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={optionsButton}
+                    onPress={handleDelete}
+                >
+                    <Text style={optionsButtonText}>Delete</Text>
+                </TouchableOpacity>
+            </View>
 
             <View style={[UNIFIED_STYLES.buttonRow, {marginTop: 60}]}>
                 <TouchableOpacity style={secondaryButton} onPress={() => navigation.navigate('EventSelector')}>
