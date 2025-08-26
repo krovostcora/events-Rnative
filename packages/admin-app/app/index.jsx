@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomeScreen from './screens/HomeScreen';
+import HomeScreen from '@events/shared/src/screens/HomeScreen';
 import EventSelector from './screens/EventSelector';
 import NewEventForm from './screens/new_event/NewEventForm';
 import EventDetails from './screens/EventDetails';

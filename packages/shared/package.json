@@ -1,0 +1,11 @@
+{
+  "name": "@events/shared",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "private": true,
+  "scripts": {
+    "build": "echo 'no build step needed for shared'"
+  },
+  "dependencies": {
+  }
+}

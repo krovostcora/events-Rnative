@@ -5,8 +5,8 @@ import {
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-} from '../../components/buttons_styles';
-import { UNIFIED_STYLES } from '../../components/constants';
+} from '../components/buttons_styles';
+import { UNIFIED_STYLES } from '../components/constants';
 
 export default function HomeScreen({ navigation }) {
     return (

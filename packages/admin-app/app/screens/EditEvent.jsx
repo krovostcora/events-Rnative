@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
-import { primaryButton, primaryButtonText, secondaryButton, secondaryButtonText } from '../../components/buttons_styles';
-import { UNIFIED_STYLES } from '../../components/constants';
+import { primaryButton, primaryButtonText, secondaryButton, secondaryButtonText } from '@events/shared/src/components/buttons_styles';
+import { UNIFIED_STYLES } from '@events/shared/src/components/constants';
 
 export default function EditEvent({ route, navigation }) {
     const { event } = route.params;
