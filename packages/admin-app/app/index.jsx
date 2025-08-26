@@ -1,7 +1,6 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomeScreen from '@events/shared/src/screens/HomeScreen';
 import EventSelector from './screens/EventSelector';
 import NewEventForm from './screens/new_event/NewEventForm';
 import EventDetails from './screens/EventDetails';
@@ -12,13 +11,14 @@ import RaceDetails from "./screens/race/RaceDetails";
 import ManageRegistrations from "./screens/registrations/ManageRegistrations";
 import PreviousResults from "./screens/race/PreviousResults";
 import EditEvent from "./screens/EditEvent";
+import {HomeScreenAdmin} from "@events/shared";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
     return (
             <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="Home" component={HomeScreenAdmin} />
                 <Stack.Screen name="EventSelector" component={EventSelector} />
                 <Stack.Screen name="NewEventForm" component={NewEventForm} />
                 <Stack.Screen name="EventDetails" component={EventDetails} />

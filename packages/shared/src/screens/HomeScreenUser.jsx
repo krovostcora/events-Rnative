@@ -8,7 +8,7 @@ import {
 } from '../components/buttons_styles';
 import { UNIFIED_STYLES } from '../components/constants';
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreenUser({ navigation }) {
     return (
         <View style={UNIFIED_STYLES.container}>
             {/* Pixel-art logo */}
@@ -36,16 +36,12 @@ export default function HomeScreen({ navigation }) {
                 ))}
             </View>
             {/* Buttons */}
-            <View style={UNIFIED_STYLES.buttonRow}>
-                <TouchableOpacity
-                    style={secondaryButton}
-                    onPress={() => BackHandler.exitApp()}
-                >
-                    <Text style={secondaryButtonText}>EXIT</Text>
-                </TouchableOpacity>
+
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <Text>Welcome User</Text>
                 <TouchableOpacity
                     style={primaryButton}
-                    onPress={() => navigation.navigate('EventSelector')}
+                    onPress={() => navigation.navigate("EventsChoose")}
                 >
                     <Text style={primaryButtonText}>START</Text>
                 </TouchableOpacity>
