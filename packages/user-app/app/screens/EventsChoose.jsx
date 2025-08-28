@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ScrollView, Text, ActivityIndicator, View, TouchableOpacity } from "react-native";
 import EventCard from "../components/EventCard";
-import {apiClient} from "@events/shared";
+import {apiClient} from "@events/shared/src";
 import { secondaryButton, secondaryButtonText } from '@events/shared/src/components/buttons_styles';
 
 export default function EventsChoose({ navigation }) {

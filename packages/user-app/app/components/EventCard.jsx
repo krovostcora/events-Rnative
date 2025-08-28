@@ -8,17 +8,9 @@ import React from "react";
 
 const BASE_URL = "https://events-server-eu5z.onrender.com/api/events";
 
-export default function EventCard({ event, eventRestrictions, navigation, onRegister, onSelect }) {
+export default function EventCard({ event, eventRestrictions, navigation }) {
     const { width } = useWindowDimensions();
     const isPhone = width < 600;
-
-    const handleSelect = () => {
-        if (onSelect) {
-            onSelect(event);
-        } else {
-            console.log('Selected event:', event);
-        }
-    };
 
     const handleRegister = () => {
         if (!event) return;
@@ -62,13 +54,6 @@ export default function EventCard({ event, eventRestrictions, navigation, onRegi
                                 onPress={handleRegister}
                             >
                                 <Text style={primaryButtonText}>Register</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={[styles.button, primaryButton, { marginLeft: isPhone ? 8 : 0, marginTop: isPhone ? 0 : 8 }]}
-                                onPress={handleSelect}
-                            >
-                                <Text style={primaryButtonText}>Select event</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

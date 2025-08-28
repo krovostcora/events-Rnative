@@ -11,14 +11,14 @@ import RaceDetails from "./screens/race/RaceDetails";
 import ManageRegistrations from "./screens/registrations/ManageRegistrations";
 import PreviousResults from "./screens/race/PreviousResults";
 import EditEvent from "./screens/EditEvent";
-import {HomeScreenAdmin} from "@events/shared";
+import {HomeScreen} from "index";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
     return (
             <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="Home" component={HomeScreenAdmin} />
+                <Stack.Screen name="Home" component={HomeScreen} />
                 <Stack.Screen name="EventSelector" component={EventSelector} />
                 <Stack.Screen name="NewEventForm" component={NewEventForm} />
                 <Stack.Screen name="EventDetails" component={EventDetails} />
