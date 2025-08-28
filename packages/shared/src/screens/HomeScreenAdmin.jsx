@@ -41,12 +41,20 @@ export default function HomeScreenAdmin({ navigation }) {
 
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <Text>Welcome Admin</Text>
+                <View style={UNIFIED_STYLES.buttonRow}>
+                <TouchableOpacity
+                    style={secondaryButton}
+                    onPress={() => BackHandler.exitApp()}
+                >
+                    <Text style={secondaryButtonText}>EXIT</Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                     style={primaryButton}
                     onPress={() => navigation.navigate("EventSelector")}
                 >
                     <Text style={primaryButtonText}>START</Text>
                 </TouchableOpacity>
+                </View>
             </View>
         </View>
     );
@@ -56,7 +64,7 @@ const PIXEL_SIZE = 24;
 
 const styles = StyleSheet.create({
     logoContainer: {
-        marginBottom: 100,
+        marginTop: 100,
         alignItems: 'center',
     },
     logoRow: {

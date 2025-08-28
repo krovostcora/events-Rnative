@@ -14,9 +14,9 @@ import {
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-} from '@events/shared/src/components/buttons_styles';
-import { UNIFIED_STYLES } from '@events/shared/src/components/constants';
-import { validateParticipant } from '@events/shared/src/utils/validateParticipant';
+} from '../components/buttons_styles';
+import { UNIFIED_STYLES } from '../components/constants';
+import { validateParticipant } from '../utils/validateParticipant';
 
 const FONT = Platform.OS === 'ios' ? 'System' : 'monospace';
 

@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import EventSelector from './screens/EventSelector';
 import NewEventForm from './screens/new_event/NewEventForm';
 import EventDetails from './screens/EventDetails';
-import Registration from './screens/registrations/Registration';
+import Registration from '@events/shared/src/screens/Registration';
 import DateSearch from "./screens/DateSearch";
 import MapScreen from "./screens/new_event/MapScreen";
 import RaceDetails from "./screens/race/RaceDetails";
