@@ -237,17 +237,17 @@ export default function ManageRegistrations({navigation, route }) {
                             {expandedCards[idx] ? (
                                 <>
                                     {[
-                                      { label: 'Name', value: item.name },
-                                      { label: 'Surname', value: item.surname },
-                                      { label: 'Age', value: item.age },
-                                      { label: 'Gender', value: item.gender },
-                                      { label: 'Email', value: item.email },
-                                      { label: 'Phone', value: item.phone },
+                                        { label: 'Name', value: item.name },
+                                        { label: 'Surname', value: item.surname },
+                                        { label: 'Age', value: item.age },
+                                        { label: 'Gender', value: item.gender },
+                                        { label: 'Email', value: item.email },
+                                        { label: 'Phone', value: item.phone },
                                     ].map(({ label, value }) => (
-                                      <React.Fragment key={label}>
-                                        <Text style={styles.label}>{label}</Text>
-                                        <Text style={styles.value}>{value}</Text>
-                                      </React.Fragment>
+                                        <React.Fragment key={label}>
+                                            <Text style={styles.label}>{label}</Text>
+                                            <Text style={styles.value}>{value}</Text>
+                                        </React.Fragment>
                                     ))}
                                     {eventRestrictions?.isRace && item.raceRole && (
                                         <>
