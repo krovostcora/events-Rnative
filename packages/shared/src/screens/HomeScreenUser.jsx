@@ -5,8 +5,8 @@ import {
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-} from '../../components/buttons_styles';
-import { UNIFIED_STYLES } from '../../components/constants';
+} from '../components/buttons_styles';
+import { UNIFIED_STYLES } from '../components/constants';
 
 export default function HomeScreen({ navigation }) {
     return (
@@ -36,7 +36,10 @@ export default function HomeScreen({ navigation }) {
                 ))}
             </View>
             {/* Buttons */}
-            <View style={UNIFIED_STYLES.buttonRow}>
+
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <Text>Welcome User</Text>
+                <View style={UNIFIED_STYLES.buttonRow}>
                 <TouchableOpacity
                     style={secondaryButton}
                     onPress={() => BackHandler.exitApp()}
@@ -45,10 +48,11 @@ export default function HomeScreen({ navigation }) {
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={primaryButton}
-                    onPress={() => navigation.navigate('EventSelector')}
+                    onPress={() => navigation.navigate("EventsChoose")}
                 >
                     <Text style={primaryButtonText}>START</Text>
                 </TouchableOpacity>
+                </View>
             </View>
         </View>
     );
@@ -58,7 +62,7 @@ const PIXEL_SIZE = 24;
 
 const styles = StyleSheet.create({
     logoContainer: {
-        marginBottom: 100,
+        marginTop: 100,
         alignItems: 'center',
     },
     logoRow: {

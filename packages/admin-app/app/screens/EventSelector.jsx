@@ -5,8 +5,8 @@ import {
     primaryButtonText,
     secondaryButton,
     secondaryButtonText,
-} from '../../components/buttons_styles';
-import { UNIFIED_STYLES } from '../../components/constants';
+} from '@events/shared/src/components/buttons_styles';
+import { UNIFIED_STYLES } from '@events/shared/src/components/constants';
 
 export default function EventSelector({ navigation }) {
     const [dropdownOpen, setDropdownOpen] = useState(false);
