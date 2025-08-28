@@ -1,7 +1,10 @@
+import React from "react";
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+import HomeScreen from "@events/shared/src/screens/HomeScreen";
 import EventsChoose from "@events/user-app/app/screens/EventsChoose";
 import Registration from "@events/shared/src/screens/Registration";
-import { NavigationContainer } from '@react-navigation/native';
-import React from "react";
 import EventSelector from "@events/admin-app/app/screens/EventSelector";
 import NewEventForm from "@events/admin-app/app/screens/new_event/NewEventForm";
 import EventDetails from "@events/admin-app/app/screens/EventDetails";
@@ -11,12 +14,6 @@ import RaceDetails from "@events/admin-app/app/screens/race/RaceDetails";
 import ManageRegistrations from "@events/admin-app/app/screens/registrations/ManageRegistrations";
 import PreviousResults from "@events/admin-app/app/screens/race/PreviousResults";
 import EditEvent from "@events/admin-app/app/screens/EditEvent";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
-export { default as apiClient } from "@events/shared/src/api/client";
-export * from "@events/shared/src/components/buttons_styles";
-export * from "@events/shared/src/components/constants";
-export { default as HomeScreen } from "@events/shared/src/screens/HomeScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -24,6 +21,7 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="Home" component={HomeScreen} />
                 <Stack.Screen name="EventsChoose" component={EventsChoose} />
                 <Stack.Screen name="Registration" component={Registration} />
                 <Stack.Screen name="EventSelector" component={EventSelector} />
