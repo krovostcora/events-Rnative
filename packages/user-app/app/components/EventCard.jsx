@@ -76,6 +76,7 @@ export default function EventCard({ event, eventRestrictions, navigation, onRegi
             </View>
         </View>
     );
+
 }
 
 const FONT = Platform.OS === "ios" ? "System" : "monospace";
