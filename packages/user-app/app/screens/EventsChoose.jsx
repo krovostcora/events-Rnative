@@ -21,22 +21,20 @@ export default function EventsChoose({ navigation }) {
             .finally(() => setLoading(false));
     }, []);
 
-    const handleRegister = (event) => {
-        // Логіка реєстрації, наприклад, перехід на екран реєстрації
-        console.log("Register for event:", event.name);
-    };
-
     if (loading) return <ActivityIndicator size="large" style={{ marginTop: 50 }} />;
     if (error) return <Text style={{ color: "red", textAlign: "center", marginTop: 50 }}>{error}</Text>;
 
     return (
         <ScrollView>
-            {events.map(event => (
-                <EventCard key={event.id} event={event} navigation={navigation} />
+            {events.map((event, index) => (
+                <EventCard key={`${event.id}-${index}`} event={event} navigation={navigation} />
             ))}
 
             <View style={{ alignItems: "center", marginVertical: 20 }}>
-                <TouchableOpacity style={secondaryButton} onPress={() => navigation.goBack()}>
+                <TouchableOpacity
+                    style={secondaryButton}
+                    onPress={() => navigation.navigate('Home')}
+                >
                     <Text style={secondaryButtonText}>Back</Text>
                 </TouchableOpacity>
             </View>

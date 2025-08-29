@@ -169,7 +169,11 @@ export default function Registration({ navigation, route }) {
     };
 
     const handleCancel = () => {
-        navigation.navigate('EventSelector');
+        if (route.params?.isAdmin) {
+            navigation.navigate('EventSelector');
+        } else {
+            navigation.navigate('EventsChoose');
+        }
     };
 
     return (

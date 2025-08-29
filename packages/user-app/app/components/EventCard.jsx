@@ -6,9 +6,7 @@ import {
 import { getFolderName } from '@events/shared/src/utils/eventHelpers';
 import React from "react";
 
-const BASE_URL = "https://events-server-eu5z.onrender.com/api/events";
-
-export default function EventCard({ event, eventRestrictions, navigation }) {
+export default function EventCard({ event, navigation }) {
     const { width } = useWindowDimensions();
     const isPhone = width < 600;
 
@@ -18,6 +16,7 @@ export default function EventCard({ event, eventRestrictions, navigation }) {
             event: {
                 ...event,
                 folder: getFolderName(event),
+                isAdmin: false,
             },
             eventRestrictions: {
                 ageLimit: event.ageLimit,
