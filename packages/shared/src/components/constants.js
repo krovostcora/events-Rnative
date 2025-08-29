@@ -7,8 +7,6 @@ export const UNIFIED_STYLES = StyleSheet.create({
         backgroundColor: '#f5f5f5',
         alignItems: 'center',
         justifyContent: 'center',
-        // paddingLeft: 30,
-        // paddingRight: 30,
         paddingTop: 16,
     },
 
@@ -44,7 +42,7 @@ export const UNIFIED_STYLES = StyleSheet.create({
         width: '100%',
         gap: 16,
         padding: 16,
-        backgroundColor: '#f5f5f5', // опціонально, щоб не зливалося з фоном
+        backgroundColor: '#f5f5f5',
     },
     input: {
         backgroundColor: '#fff',

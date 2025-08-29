@@ -15,24 +15,6 @@ const apiClient = {
         const response = await fetch(`${BASE_URL}/${id}`);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         return response.json();
-    },
-
-    // update participant by eventId and participantId
-    updateParticipant: async (eventId, participantId, participantData) => {
-        const response = await fetch(`${BASE_URL}/${eventId}/participants/${participantId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(participantData)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-        }
-
-        return response.json();
     }
 };
 

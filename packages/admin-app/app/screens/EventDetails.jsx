@@ -8,7 +8,6 @@ import {
     optionsButton, optionsButtonText,
 } from '@events/shared/src/components/buttons_styles';
 import { UNIFIED_STYLES } from '@events/shared/src/components/constants';
-import Registration from "@events/shared/src/screens/Registration";
 
 const FONT = Platform.OS === 'ios' ? 'System' : 'monospace';
 
@@ -239,6 +238,7 @@ export default function EventDetails({ route, navigation }) {
                             event: {
                                 ...event,
                                 folder: getFolderName(event),
+                                isAdmin: true,
                             },
                             eventRestrictions: {
                                 ageLimit: event.ageLimit,

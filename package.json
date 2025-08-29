@@ -7,7 +7,6 @@
     "install:all": "npm install",
     "start": "expo start",
     "start:admin": "npm --workspace=@events/admin-app run start",
-    "start:shared": "npm --workspace=@events/shared run start",
     "start:user": "npm --workspace=@events/user-app run start"
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useCallback, useState} from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, BackHandler, TextInput } from 'react-native';
 import {
     primaryButton,
@@ -7,6 +7,7 @@ import {
     secondaryButtonText,
 } from '../components/buttons_styles';
 import { UNIFIED_STYLES } from '../components/constants';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function HomeScreen({ navigation }) {
     const [password, setPassword] = useState('');
@@ -21,6 +22,14 @@ export default function HomeScreen({ navigation }) {
         }
         setChecked(true);
     };
+
+    useFocusEffect(
+        useCallback(() => {
+            setPassword('');
+            setChecked(false);
+            setIsAdmin(false);
+        }, [])
+    );
 
     return (
         <View style={UNIFIED_STYLES.container}>
@@ -76,7 +85,8 @@ export default function HomeScreen({ navigation }) {
                             <TouchableOpacity
                                 style={primaryButton}
                                 onPress={() => navigation.navigate(
-                                    isAdmin ? "EventSelector" : "EventsChoose"
+                                    isAdmin ? "EventSelector" : "EventsChoose",
+                                    { isAdmin }
                                 )}
                             >
                                 <Text style={primaryButtonText}>START</Text>
