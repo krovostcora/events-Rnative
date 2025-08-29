@@ -92,7 +92,7 @@ export default function RaceDetails({ navigation, route }) {
         setEditIndex(index);
         setEditEntry({
             id: entry.id,
-            // показуємо час у форматі HH:MM:SS
+            // show time in format HH:MM:SS
             time: `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`,
         });
     };
@@ -105,7 +105,7 @@ export default function RaceDetails({ navigation, route }) {
             return;
         }
 
-        // розбиваємо HH:MM:SS на секунди
+        // break HH:MM:SS to seconds
         const [hrs, mins, secs] = editEntry.time.split(':').map(Number);
         const elapsedMs = (hrs * 3600 + mins * 60 + secs) * 1000;
 
@@ -114,9 +114,7 @@ export default function RaceDetails({ navigation, route }) {
 
         updated[editIndex] = {
             ...oldEntry,
-            // зберігаємо startTime без змін
             startTime: oldEntry.startTime || Date.now(),
-            // обчислюємо finishTime через startTime + відредагований час
             finishTime: (oldEntry.startTime || Date.now()) + elapsedMs,
             id: editEntry.id,
         };
@@ -140,20 +138,15 @@ export default function RaceDetails({ navigation, route }) {
         return () => clearInterval(timerRef.current);
     }, [running]);
 
-
-// 2. Start new race: reset timer and entries, and start timer
-    // Start new race: зберігаємо абсолютний час старту
     const handleStartNewRace = () => {
         setEntries([]);
         setEditIndex(null);
-        setTime(0);          // <-- reset timer display
+        setTime(0);
         const now = Date.now();
         setStartTime(now);
-        setRunning(true);    // запускаємо секундомір
+        setRunning(true);
     };
 
-
-// Finish гонки: зберігаємо finishTime для кожного
     const handleFinish = () => {
         if (!startTime) return;
         const newId = entries.length + 1;
@@ -167,7 +160,6 @@ export default function RaceDetails({ navigation, route }) {
         ]);
     };
 
-// Форматування часу гонки
     const formatRaceTime = (entry) => {
         if (!entry.startTime || !entry.finishTime) return '00:00:00';
         const elapsed = Math.floor((entry.finishTime - entry.startTime) / 1000);
@@ -191,7 +183,6 @@ export default function RaceDetails({ navigation, route }) {
                         value={editEntry.time}
                         style={[styles.cellTime, { flex: 1.1 }]}
                         onChangeText={(text) => {
-                            // дозволяємо лише цифри, замінюємо двокрапки автоматично
                             const cleaned = text.replace(/[^0-9]/g, '');
                             let formatted = '';
                             if (cleaned.length > 0) formatted += cleaned.slice(0,2);
