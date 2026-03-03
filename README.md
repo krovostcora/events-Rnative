@@ -3,6 +3,9 @@
 This is the frontend part of the **Events App**, which I'm developing during my internship.  
 The app allows users to create, manage, and register for different types of events, including races.
 
+![Events app](https://github.com/user-attachments/assets/7ae45514-5553-4935-a0e3-756a4303465c)
+
+
 ## Features
 
 - Event creation with optional race-specific fields  
